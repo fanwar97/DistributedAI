@@ -36,13 +36,7 @@ class GenerateDGA:
         return False
 
     def run_algorithm(self, arguments, file):
-        """
-        Run each algorithm script.\n
-        I did this as a whole project folder with virtual env included. If you don't use Python
-        on Windows (Microsoft Store) like me, be sure to change the path to your Python
-        installation where the required packages are installed. And make sure that the main.py
-        script is run from within this folder, or else it won't work.
-        """
+        """Run each algorithm script"""
         # Change your python path here (e.g. .venv/Scripts/python.exe)
         command_list = [self.org_path + self.python_path, os.path.basename(file)]
         command_list.extend(arguments)
