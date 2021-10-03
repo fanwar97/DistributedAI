@@ -150,8 +150,16 @@ class GenerateDGA:
                             str(self.number_of_samples)], file)
 
 ### Example with 500 samples
+### Must clear domain list before generating a new one
 if __name__=="__main__":
     gen = GenerateDGA(500, ".venv/Scripts/python.exe")
-    gen.get_benign()
-    gen.get_attack_char_based()
-    gen.get_attack_dict_based()
+    if gen.get_benign():
+        for i in range(2):
+            if i == 0:
+                gen.get_attack_dict_based()
+            if i == 1:
+                gen.get_attack_char_based()
+            gen.domain_list.clear()
+    else:
+        print("Not enough benign domains were generated.\n"
+                "Please increase the random probability before running the script again!")
