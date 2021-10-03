@@ -37,7 +37,6 @@ class GenerateDGA:
 
     def run_algorithm(self, arguments, file):
         """Run each algorithm script"""
-        # Change your python path here (e.g. .venv/Scripts/python.exe)
         command_list = [self.org_path + self.python_path, os.path.basename(file)]
         command_list.extend(arguments)
         os.chdir(self.org_path + file.replace(os.path.basename(file), ""))
