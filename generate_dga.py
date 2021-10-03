@@ -44,7 +44,7 @@ class GenerateDGA:
         script is run from within this folder, or else it won't work.
         """
         # Change your python path here (e.g. .venv/Scripts/python.exe)
-        command_list = [self.org_path + ".venv/Scripts/python.exe", os.path.basename(file)]
+        command_list = [self.org_path + self.python_path, os.path.basename(file)]
         command_list.extend(arguments)
         os.chdir(self.org_path + file.replace(os.path.basename(file), ""))
         with subprocess.Popen(command_list, stdout=subprocess.PIPE) as proc:
