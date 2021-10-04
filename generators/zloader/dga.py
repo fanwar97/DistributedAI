@@ -79,4 +79,4 @@ if __name__ == "__main__":
     else:
         d = datetime.now()
     seed = seeding(d, args.rc4)
-    dga(seed, 32)
+    dga(seed, 5000)

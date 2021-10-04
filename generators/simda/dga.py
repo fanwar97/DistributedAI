@@ -10,7 +10,7 @@ step = 0
 for m in key:
     step += ord(m)
 
-for nr in range(1000):
+for nr in range(5000):
     domain = ""
     base += step
 

@@ -10,7 +10,7 @@ def dga(prefix):
     if not pattern:
         raise ValueError("unsupported pattern {}".format(prefix))
 
-    for i in range(101):
+    for i in range(5000):
         yield pattern.format(i) 
 
 if __name__=="__main__":

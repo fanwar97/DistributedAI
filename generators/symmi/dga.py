@@ -3,7 +3,7 @@ from  datetime import datetime
 
 seed_const = 42
 days_period = 16
-nr_of_domains = 64
+nr_of_domains = 5000
 third_lvl_min_len = 8
 third_lvl_max_len = 15
 

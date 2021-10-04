@@ -240,6 +240,6 @@ if __name__ == "__main__":
     else:
         d = datetime.now()
 
-    for i in range(12):
+    for i in range(5000):
         print( dga(d, args.config, i) )
             
