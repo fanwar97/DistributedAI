@@ -16,7 +16,7 @@ def prng(seed_string):
 def dga(seed, d):
     tlds = ["cc", "co", "eu"]
     dga_domains = []
-    for i in range(10):
+    for i in range(5000):
         for j, tld in enumerate(tlds):
             ss = ".".join([str(s) for s in [seed, d.month, d.day, d.year, tld]])
             r = abs(prng(ss)) + i

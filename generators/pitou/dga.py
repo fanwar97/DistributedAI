@@ -120,7 +120,7 @@ if __name__=="__main__":
     else:
         d = datetime.now()
 
-    for c in range(20):
+    for c in range(400):
         seed = date2seed(d)
         domains = dga(d.year, seed, c, int(args.magic, 16))
         if type(domains) == str:

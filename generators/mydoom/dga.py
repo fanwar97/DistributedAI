@@ -22,7 +22,7 @@ def dga(date, magic, number):
     seed = date.year + date.month + date.day + magic
     r = Rand(seed)
 
-    for i in range(1, number):
+    for i in range(number):
         if i == 0x33:
             r = Rand(magic)
         v1 = r.rand()

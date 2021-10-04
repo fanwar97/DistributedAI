@@ -11,6 +11,6 @@ def next_domain(domain):
 
 seed = 'earnestnessbiophysicalohax.com' # 15372 equal to 0 (seed = 0)
 domain = seed
-for i in range(1000):
+for i in range(5000):
     print(domain)
     domain = next_domain(domain)

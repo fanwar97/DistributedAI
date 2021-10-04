@@ -79,7 +79,7 @@ seed = random.randint(0, 1000*3600*24)
 
 if __name__ == "__main__":
     mersenne = Mersenne(seed)
-    for nr in range(100):
+    for nr in range(5000):
         domain = ""
         for i in range(10):
             c = charset[randint(mersenne, len(charset))]

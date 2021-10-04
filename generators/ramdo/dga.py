@@ -10,7 +10,7 @@ def dga(seed, nr):
     domain += ".org"
     return domain
 
-for nr in range(20):
+for nr in range(5000):
     print(dga(0xD5FFF, nr))
 
 

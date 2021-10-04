@@ -1,0 +1,12 @@
+# Note
+- Algorithms that cannot generate 5000 samples:
+    - bazarbackdoor\dga.py
+    - chinad
+    - locky\dgav2.py
+    - padcrypt
+    - pushdo
+    - qsnatch
+    - sisron
+    - tempedreve
+    - tinba
+    - unnamed_downloader

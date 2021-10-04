@@ -43,6 +43,6 @@ if __name__=="__main__":
     else:
         date = datetime.now() 
 
-    for sequence_nr in range(2048):
+    for sequence_nr in range(5000):
         print(generate_necurs_domain(sequence_nr, 9, date))
 

@@ -35,7 +35,7 @@ if __name__=="__main__":
 
     charset, r = init_rand_and_chars(d.year, d.month, day, 1, 
             int(args.seed, 16)) 
-    for _ in range(40):
+    for _ in range(args.nr):
         r = generate_domain(charset, r)
     
     

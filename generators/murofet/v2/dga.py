@@ -5,7 +5,7 @@ import argparse
 
 def dga(date, key):
 
-    for index in range(1020):
+    for index in range(5000):
         seed = 8*[0]
         seed[0] = ((date.year & 0xFF) + 0x30) & 0xFF
         seed[1] = date.month & 0xFF

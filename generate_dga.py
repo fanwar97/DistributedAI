@@ -46,6 +46,8 @@ class GenerateDGA:
         temp_domain_list.pop()
         if len(temp_domain_list) > self.number_of_samples:
             temp_domain_list = random.sample(temp_domain_list, self.number_of_samples)
+        elif len(temp_domain_list) < self.number_of_samples:
+            print("Not enough")
         self.domain_list.extend(temp_domain_list)
 
 
@@ -70,9 +72,7 @@ class GenerateDGA:
     def write_attack_to_file(self, attack_type):
         """Write the generated samples to a text file"""
         os.chdir(self.org_path)
-        self.domain_list = random.sample(self.domain_list, self.number_of_samples)
-        with open("attack_" + str(self.number_of_samples) + "_" + attack_type + ".txt", "w",
-                    encoding="utf-8") as file:
+        with open("attack_" + attack_type + ".txt", "w", encoding="utf-8") as file:
             for element in self.domain_list:
                 file.write(element + "\n")
 
@@ -97,14 +97,21 @@ class GenerateDGA:
         This function evaluates algorithm name and execute with corresponding params.
         """
         char_based_case = {
-            "dircrypt": lambda: self.case_4(file),
-            "dnschanger": lambda: self.case_4(file),
+            "corebot": lambda: self.case_4(file),
+            "dircrypt": lambda: self.case_3(file),
+            "dnschanger": lambda: self.case_3(file),
             "fobber": lambda: self.case_2(file),
-            "kraken": lambda: self.case_3(file),
-            "ramnit": lambda: self.case_4(file),
+            "kraken": lambda: self.case_4(file),
+            "mydoom": lambda: self.case_4(file),
+            "newgoz": lambda: self.case_4(file),
+            "nymaim": lambda: self.case_4(file),
+            "pizd": lambda: self.case_4(file),
+            "pykspa": lambda: self.case_4(file),
+            "qakbot": lambda: self.case_4(file),
+            "ramnit": lambda: self.case_3(file),
             "shiotob": lambda: self.case_0(file),
             "unknown_malware": lambda: self.case_1(file),
-            "vawtrak": lambda: self.case_3(file)
+            "vawtrak": lambda: self.case_4(file)
         }
         is_char_based_with_params = False
         for item in char_based_case.items():
@@ -117,8 +124,7 @@ class GenerateDGA:
     def case_0(self, file):
         """For shiotob"""
         os.chdir(self.org_path)
-        with open("benign_" + str(self.number_of_samples) + ".txt", "r",
-                        encoding="utf-8") as temp_file:
+        with open("benign.txt", "r", encoding="utf-8") as temp_file:
             if random.randrange(self.number_of_samples):
                 temp_file.readline()
             seed_domain = temp_file.readline()
@@ -134,25 +140,21 @@ class GenerateDGA:
         self.run_algorithm([str(random.randint(1,2)), "-n", str(self.number_of_samples)], file)
 
     def case_3(self, file):
-        """For kraken and vawtrak"""
-        self.run_algorithm(["-n", str(self.number_of_samples)], file)
-
-    def case_4(self, file):
         """For dircrypt, dnstracker and ramnit"""
         self.run_algorithm([str(random.randint(0, self.number_of_samples)), "-n",
                             str(self.number_of_samples)], file)
+    
+    def case_4(self, file):
+        """For corebot, kraken, mydoom, newgoz, nymaim, pizd, qakbot and vawtrak"""
+        self.run_algorithm(["-n", str(self.number_of_samples)], file)
 
 ### Example with 500 samples
 ### Must clear domain list before generating a new one
 if __name__=="__main__":
-    gen = GenerateDGA(500, ".venv/Scripts/python.exe")
-    if gen.get_benign():
-        for i in range(2):
-            if i == 0:
-                gen.get_attack_dict_based()
-            if i == 1:
-                gen.get_attack_char_based()
-            gen.domain_list.clear()
-    else:
-        print("Not enough benign domains were generated.\n"
-                "Please increase the random probability before running the script again!")
+    gen = GenerateDGA(5000, ".venv/Scripts/python.exe")
+    for i in range(2):
+        if i == 0:
+            gen.get_attack_dict_based()
+        if i == 1:
+            gen.get_attack_char_based()
+        gen.domain_list.clear()

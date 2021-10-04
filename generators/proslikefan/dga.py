@@ -5,7 +5,7 @@ from datetime import datetime
 def dga(date, magic, tlds):
 #    tlds = ["eu", "biz", "se", "info", "com", "net", "org", "ru", "in", 
 #            "name"]
-    for i in range(10):
+    for i in range(500):
         for tld in tlds:
             seed_string = '.'.join([str(s) for s in 
                     [magic, date.month, date.day, date.year, tld]])
