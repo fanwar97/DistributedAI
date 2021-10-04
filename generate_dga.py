@@ -124,8 +124,7 @@ class GenerateDGA:
     def case_0(self, file):
         """For shiotob"""
         os.chdir(self.org_path)
-        with open("benign_" + str(self.number_of_samples) + ".txt", "r",
-                        encoding="utf-8") as temp_file:
+        with open("benign.txt", "r", encoding="utf-8") as temp_file:
             if random.randrange(self.number_of_samples):
                 temp_file.readline()
             seed_domain = temp_file.readline()
