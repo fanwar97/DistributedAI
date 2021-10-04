@@ -2,6 +2,7 @@
 Module to generate DGAs
 """
 import glob
+import math
 import os
 import random
 import subprocess
@@ -9,12 +10,15 @@ import subprocess
 class GenerateDGA:
     """Class to generate domains"""
     def __init__(self, number_of_samples, python_path):
-        self.org_path = os.getcwd() + "/"
-        self.files = list(glob.glob("generators" + "/**/dga*.py", recursive=True))
-        self.dict_based = ["gozi", "nymaim2", "pizd", "suppobox"]
-        self.domain_list = []
-        self.number_of_samples = number_of_samples
-        self.python_path = python_path
+        self.__org_path = os.getcwd() + "/"
+        self.__files = list(glob.glob("generators" + "/**/dga*.py", recursive=True))
+        self.__dict_based = ["gozi", "nymaim2", "pizd", "suppobox"]
+        self.__limited = ["bazarbackdoor\\dga.py", "chinad", "locky\\dgav2.py",
+                            "padcrypt", "pushdo", "qsnatch", "sisron", "tempedreve",
+                            "tinba", "unnamed_downloader"]
+        self.__domain_list = []
+        self.__number_of_samples = number_of_samples
+        self.__python_path = python_path
 
     # Random probability = 1/out_of
     # If the generated samples were not enough, pass a lower out_of argument
@@ -22,139 +26,211 @@ class GenerateDGA:
     def get_benign(self, out_of = 100):
         """Get random benign domains"""
         print("Generating benign domains...")
-        with open(self.org_path + "benign.txt", "r", encoding="utf-8") as file1:
+        with open(self.__org_path + "benign.txt", "r", encoding="utf-8") as file1:
             counter = 0
-            with open("benign_" + str(self.number_of_samples) + ".txt", "w",
+            with open("benign_" + str(self.__number_of_samples) + ".txt", "w",
                         encoding="utf-8") as file2:
                 for aline in file1:
                     if random.randrange(out_of):
                         continue
                     file2.write(aline)
                     counter += 1
-                    if counter == self.number_of_samples:
+                    if counter == self.__number_of_samples:
                         return True
         return False
-
-    def run_algorithm(self, arguments, file):
-        """Run each algorithm script"""
-        command_list = [self.org_path + self.python_path, os.path.basename(file)]
-        command_list.extend(arguments)
-        os.chdir(self.org_path + file.replace(os.path.basename(file), ""))
-        with subprocess.Popen(command_list, stdout=subprocess.PIPE) as proc:
-            out = proc.communicate()[0]
-        temp_domain_list = out.decode("utf-8").split("\r\n")
-        temp_domain_list.pop()
-        if len(temp_domain_list) > self.number_of_samples:
-            temp_domain_list = random.sample(temp_domain_list, self.number_of_samples)
-        elif len(temp_domain_list) < self.number_of_samples:
-            print("Not enough")
-        self.domain_list.extend(temp_domain_list)
-
 
     def get_attack_dict_based(self):
         """Get random dict based domains."""
         print("Generating dict based domains...")
-        for file in self.files:
+        for file in self.__files:
             is_dict_based = False
-            for element in self.dict_based:
+            for element in self.__dict_based:
                 if element in file:
                     is_dict_based = True
                     print(file)
+                    break
             if not is_dict_based:
                 continue
-            if is_dict_based and "suppobox" in file:
-                self.run_algorithm([str(random.randint(1,3)), "-n",
-                                    str(self.number_of_samples)], file)
-            elif is_dict_based:
-                self.run_algorithm(["-n", str(self.number_of_samples)], file)
-        self.write_attack_to_file("dict_based")
-
-    def write_attack_to_file(self, attack_type):
-        """Write the generated samples to a text file"""
-        os.chdir(self.org_path)
-        with open("attack_" + attack_type + ".txt", "w", encoding="utf-8") as file:
-            for element in self.domain_list:
-                file.write(element + "\n")
+            self.__exec_dict_based(file)
+        self.__write_attack_to_file(self.__domain_list, "attack_dict_based.txt")
+        self.__domain_list.clear()
 
     def get_attack_char_based(self):
         """Get random char based domains"""
         print("Generating char based domains...")
-        for file in self.files:
+        for file in self.__files:
             is_char_based = True
-            for element in self.dict_based:
+            for element in self.__dict_based:
                 if element in file:
                     is_char_based = False
+                    break
             if is_char_based:
                 print(file)
             else:
                 continue
-            self.exec_char_based(file)
-        self.write_attack_to_file("char_based")
+            self.__exec_char_based(file)
+        self.__write_attack_to_file(self.__domain_list, "attack_char_based.txt")
+        self.__domain_list.clear()
 
-    def exec_char_based(self, file):
+    def get_attack_by_algo(self, algo_name, samples_per_file, number_of_files):
         """
-        Execute the corresponding algorithm script.\n
+        Generate attacks by algorithm name\n
+        NOTE: This function will OVERWRITE number_of_samples properties. In order not to make
+        any mistakes, please create an object to only use this function.
+        """
+        self.__number_of_samples = samples_per_file * number_of_files # Overwriten
+        algo_list = os.listdir("generators")
+        is_exist = self.__check_in_list(algo_name, algo_list)
+        if not is_exist:
+            print("Algorithm doesn't exist. Please check again!")
+        else:
+            is_dict_based = self.__check_in_list(algo_name, self.__dict_based)
+            is_limited = self.__check_in_list(algo_name, self.__limited)
+            if is_limited and not is_dict_based:
+                print("Please be aware that this algorithm is hardcoded and cannot generate "
+                        "any specified number of samples.")
+                print("Numbers of generated files can be less than expected.")
+            for file in self.__files:
+                if algo_name in file:
+                    if not is_dict_based:
+                        self.__exec_char_based(file)
+                    else:
+                        self.__exec_dict_based(file)
+                    break
+            if len(self.__domain_list) < self.__number_of_samples:
+                number_of_files = math.ceil(len(self.__domain_list) / samples_per_file)
+            for index in range(number_of_files):
+                temp_list = self.__domain_list[index*samples_per_file:(index+1)*samples_per_file-1]
+                self.__write_attack_to_file(temp_list, algo_name + "_" + str(samples_per_file)
+                                            + "_" + str(index+1).zfill(2) + ".txt")
+            self.__domain_list.clear()
+
+    def __run_algorithm(self, arguments, file):
+        """Run each algorithm script"""
+        is_limited = False
+        command_list = [self.__org_path + self.__python_path, os.path.basename(file)]
+        command_list.extend(arguments)
+        os.chdir(self.__org_path + file.replace(os.path.basename(file), ""))
+        with subprocess.Popen(command_list, stdout=subprocess.PIPE) as proc:
+            out = proc.communicate()[0]
+        temp_domain_list = out.decode("utf-8").split("\r\n")
+        temp_domain_list.pop()
+        if len(temp_domain_list) > self.__number_of_samples:
+            temp_domain_list = random.sample(temp_domain_list, self.__number_of_samples)
+        elif len(temp_domain_list) < self.__number_of_samples:
+            for elem in self.__limited:
+                if elem in file:
+                    is_limited = True
+                    break
+            if not is_limited:
+                print("Not enough")
+        self.__domain_list.extend(temp_domain_list)
+
+    def __exec_dict_based(self, file):
+        """
+        Execute the corresponding dict based script.\n
+        This function evaluates algorithm name and execute with corresponding params.
+        """
+        if "suppobox" in file:
+            self.__run_algorithm([str(random.randint(1,3)), "-n",
+                                str(self.__number_of_samples)], file)
+        else:
+            self.__run_algorithm(["-n", str(self.__number_of_samples)], file)
+
+    def __write_attack_to_file(self, domain_list, output_name):
+        """Write the generated samples to a text file"""
+        os.chdir(self.__org_path)
+        with open(output_name, "w", encoding="utf-8") as file:
+            for element in domain_list:
+                file.write(element + "\n")
+
+    def __exec_char_based(self, file):
+        """
+        Execute the corresponding char based script.\n
         This function evaluates algorithm name and execute with corresponding params.
         """
         char_based_case = {
-            "corebot": lambda: self.case_4(file),
-            "dircrypt": lambda: self.case_3(file),
-            "dnschanger": lambda: self.case_3(file),
-            "fobber": lambda: self.case_2(file),
-            "kraken": lambda: self.case_4(file),
-            "mydoom": lambda: self.case_4(file),
-            "newgoz": lambda: self.case_4(file),
-            "nymaim": lambda: self.case_4(file),
-            "pizd": lambda: self.case_4(file),
-            "pykspa": lambda: self.case_4(file),
-            "qakbot": lambda: self.case_4(file),
-            "ramnit": lambda: self.case_3(file),
-            "shiotob": lambda: self.case_0(file),
-            "unknown_malware": lambda: self.case_1(file),
-            "vawtrak": lambda: self.case_4(file)
+            "banjori": lambda: self.__case_4(file),
+            "corebot": lambda: self.__case_4(file),
+            "dircrypt": lambda: self.__case_3(file),
+            "dnschanger": lambda: self.__case_3(file),
+            "fobber": lambda: self.__case_2(file),
+            "fosniw": lambda: self.__case_4(file),
+            "kraken": lambda: self.__case_4(file),
+            "locky\\dgav3.py": lambda: self.__case_4(file),
+            "murofet": lambda: self.__case_4(file),
+            "mydoom": lambda: self.__case_4(file),
+            "necurs": lambda: self.__case_4(file),
+            "newgoz": lambda: self.__case_4(file),
+            "nymaim": lambda: self.__case_4(file),
+            "pitou": lambda: self.__case_4(file),
+            "pizd": lambda: self.__case_4(file),
+            "proslikefan": lambda: self.__case_4(file),
+            "pykspa": lambda: self.__case_4(file),
+            "qadars": lambda: self.__case_4(file),
+            "qakbot": lambda: self.__case_4(file),
+            "ramdo": lambda: self.__case_4(file),
+            "ramnit": lambda: self.__case_3(file),
+            "reconyc": lambda: self.__case_4(file),
+            "shiotob": lambda: self.__case_0(file),
+            "simda": lambda: self.__case_4(file),
+            "symmi": lambda: self.__case_4(file),
+            "unknown_malware": lambda: self.__case_1(file),
+            "vawtrak": lambda: self.__case_4(file),
+            "zloader": lambda: self.__case_4(file),
         }
         is_char_based_with_params = False
         for item in char_based_case.items():
             if item[0] in file:
                 is_char_based_with_params = True
                 item[1]()
+                break
         if not is_char_based_with_params:
-            self.run_algorithm([], file)
+            self.__run_algorithm([], file)
 
-    def case_0(self, file):
+    def __case_0(self, file):
         """For shiotob"""
-        os.chdir(self.org_path)
+        os.chdir(self.__org_path)
         with open("benign.txt", "r", encoding="utf-8") as temp_file:
-            if random.randrange(self.number_of_samples):
+            if random.randrange(self.__number_of_samples):
                 temp_file.readline()
             seed_domain = temp_file.readline()
-        self.run_algorithm([seed_domain, "-n", str(self.number_of_samples)], file)
+        self.__run_algorithm([seed_domain, "-n", str(self.__number_of_samples)], file)
 
-    def case_1(self, file):
+    def __case_1(self, file):
         """For unknown_malware"""
         choice_list = ["sn", "al"]
-        self.run_algorithm([random.choice(choice_list), "-n", str(self.number_of_samples)], file)
+        self.__run_algorithm([random.choice(choice_list), "-n",
+                                str(self.__number_of_samples)], file)
 
-    def case_2(self, file):
+    def __case_2(self, file):
         """For fobber"""
-        self.run_algorithm([str(random.randint(1,2)), "-n", str(self.number_of_samples)], file)
+        self.__run_algorithm([str(random.randint(1,2)), "-n", str(self.__number_of_samples)], file)
 
-    def case_3(self, file):
+    def __case_3(self, file):
         """For dircrypt, dnstracker and ramnit"""
-        self.run_algorithm([str(random.randint(0, self.number_of_samples)), "-n",
-                            str(self.number_of_samples)], file)
-    
-    def case_4(self, file):
-        """For corebot, kraken, mydoom, newgoz, nymaim, pizd, qakbot and vawtrak"""
-        self.run_algorithm(["-n", str(self.number_of_samples)], file)
+        self.__run_algorithm([str(random.randint(0, self.__number_of_samples)), "-n",
+                                str(self.__number_of_samples)], file)
 
-### Example with 500 samples
-### Must clear domain list before generating a new one
+    def __case_4(self, file):
+        """Most of the cases"""
+        self.__run_algorithm(["-n", str(self.__number_of_samples)], file)
+
+    @staticmethod
+    def __check_in_list(name, alist):
+        """Check if a name is in a list"""
+        for elem in alist:
+            if name in elem:
+                return True
+        return False
+
 if __name__=="__main__":
-    gen = GenerateDGA(5000, ".venv/Scripts/python.exe")
-    for i in range(2):
-        if i == 0:
-            gen.get_attack_dict_based()
-        if i == 1:
-            gen.get_attack_char_based()
-        gen.domain_list.clear()
+    # gen = GenerateDGA(100, ".venv/Scripts/python.exe")
+    # for i in range(2):
+    #     if i == 0:
+    #         gen.get_attack_dict_based()
+    #     if i == 1:
+    #         gen.get_attack_char_based()
+
+    gen = GenerateDGA(0, ".venv/Scripts/python.exe")
+    gen.get_attack_by_algo("chinad", 500, 10)

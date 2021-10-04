@@ -3,7 +3,6 @@ from  datetime import datetime
 
 seed_const = 42
 days_period = 16
-nr_of_domains = 5000
 third_lvl_min_len = 8
 third_lvl_max_len = 15
 
@@ -44,6 +43,7 @@ def create_seed(date):
 if __name__=="__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-d", "--date", help="as YYYY-mm-dd")
+    parser.add_argument("-n", "--nr", type=int, help="nr of domains to generate")
     args = parser.parse_args()
     date_str = args.date
     if date_str:
@@ -51,4 +51,4 @@ if __name__=="__main__":
     else:
         date = datetime.now() 
     seed = create_seed(date)
-    dga(seed, ".ddns.net", nr_of_domains)
+    dga(seed, ".ddns.net", args.nr)

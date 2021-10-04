@@ -71,6 +71,7 @@ if __name__ == "__main__":
             help="rc4 key from config",
             choices=["q23Cud3xsNf3","41997b4a729e1a0175208305170752dd", "kZieCw23gffpe43Sd",  "Ts72YjsjO5TghE6m", "03d5ae30a0bd934a23b6a7f0756aa504"],
             default="q23Cud3xsNf3")
+    parser.add_argument("-n", "--nr", type=int, help="nr of domains to generate")
 
 
     args = parser.parse_args()
@@ -79,4 +80,4 @@ if __name__ == "__main__":
     else:
         d = datetime.now()
     seed = seeding(d, args.rc4)
-    dga(seed, 5000)
+    dga(seed, args.nr)

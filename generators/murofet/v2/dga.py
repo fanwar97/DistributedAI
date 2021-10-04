@@ -3,9 +3,9 @@ from datetime import datetime, timedelta
 import argparse
 
 
-def dga(date, key):
+def dga(date, key, nr):
 
-    for index in range(5000):
+    for index in range(nr):
         seed = 8*[0]
         seed[0] = ((date.year & 0xFF) + 0x30) & 0xFF
         seed[1] = date.month & 0xFF
@@ -49,6 +49,7 @@ if __name__=="__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-d", "--date", help="date for which to generate domains")
     parser.add_argument("-k", "--key", help="key", default=None)
+    parser.add_argument("-n", "--nr", type=int, help="nr of domains to generate")
     args = parser.parse_args()
     if args.key:
         key = int(args.key, 16)
@@ -58,4 +59,4 @@ if __name__=="__main__":
         d = datetime.strptime(args.date, "%Y-%m-%d")
     else:
         d = datetime.now()
-    dga(d, key)
+    dga(d, key, args.nr)

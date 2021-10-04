@@ -7,7 +7,7 @@ import string
 def rand(r, seed):
     return  (seed - 1043968403*r) & 0x7FFFFFFF
 
-def dga(date, seed):
+def dga(date, seed, nr):
     charset = string.ascii_lowercase + string.digits
     if seed in [0xE1F2, 0xE1F1, 0xE1F5]:
         tlds = [".com", ".org", ".net"]
@@ -17,7 +17,7 @@ def dga(date, seed):
     b = 7*24*3600
     c = 4*24*3600
     r = unix - (unix-c) % b
-    for i in range(200):
+    for i in range(nr):
         domain = ""
         for _ in range(12):
             r = rand(r, seed)
@@ -37,6 +37,7 @@ if __name__ == "__main__":
             default="e08a")
     parser.add_argument("-a", "--all-seeds", action="store_true",
             help="use all seeds")
+    parser.add_argument("-n", "--nr", type=int, help="nr of domains to generate")
     args = parser.parse_args()
 
     if args.date:
@@ -48,4 +49,4 @@ if __name__ == "__main__":
         seeds = [args.seed]
 
     for seed in seeds:
-        dga(d, int(seed, 16))
+        dga(d, int(seed, 16), args.nr)

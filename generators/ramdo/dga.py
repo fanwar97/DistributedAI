@@ -1,3 +1,5 @@
+import argparse
+
 def dga(seed, nr):
     s = (2 * seed * (nr + 1))
     r = s ^ (26 * seed * nr)
@@ -10,7 +12,11 @@ def dga(seed, nr):
     domain += ".org"
     return domain
 
-for nr in range(5000):
+parser = argparse.ArgumentParser()
+parser.add_argument("-n", "--nr", type=int, help="nr of domains to generate")
+args = parser.parse_args()
+
+for nr in range(args.nr):
     print(dga(0xD5FFF, nr))
 
 

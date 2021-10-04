@@ -5,7 +5,7 @@
     unpacks to:  db0820a974dbea22d981bd39ddb19518
 """
 
-
+import argparse
 import random
 
 class Mersenne:
@@ -78,8 +78,11 @@ charset = "iHRYg79zJXaGw1CF5K0d3vZobhAlx6StUBnjOIMpe2yVuPr4sL8DqmQTkEcWNf"
 seed = random.randint(0, 1000*3600*24) 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-n", "--nr", type=int, help="nr of domains to generate")
+    args = parser.parse_args()
     mersenne = Mersenne(seed)
-    for nr in range(5000):
+    for nr in range(args.nr):
         domain = ""
         for i in range(10):
             c = charset[randint(mersenne, len(charset))]

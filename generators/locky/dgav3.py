@@ -233,6 +233,7 @@ if __name__ == "__main__":
             help="date for which to generate domains")
     parser.add_argument("-c", "--config", choices=list(range(1,len(config)+1)),
             help="config nr", type=int, default=1)
+    parser.add_argument("-n", "--nr", type=int, help="nr of domains to generate")
     args = parser.parse_args()
 
     if args.date:
@@ -240,6 +241,6 @@ if __name__ == "__main__":
     else:
         d = datetime.now()
 
-    for i in range(5000):
+    for i in range(args.nr):
         print( dga(d, args.config, i) )
             

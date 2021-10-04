@@ -1,4 +1,5 @@
 import argparse
+import math
 from datetime import date, datetime, timedelta
 from calendar import monthrange
 
@@ -113,6 +114,7 @@ if __name__=="__main__":
 
     parser.add_argument("-m", "--magic", choices=["0xDAFE02D", "0xDAFE02C"],
             default="0xDAFE02C", help="magic seed")
+    parser.add_argument("-n", "--nr", type=int, help="nr of domains to generate")
     args = parser.parse_args()
 
     if args.date:
@@ -120,7 +122,7 @@ if __name__=="__main__":
     else:
         d = datetime.now()
 
-    for c in range(400):
+    for c in range(math.ceil(args.nr/12)):
         seed = date2seed(d)
         domains = dga(d.year, seed, c, int(args.magic, 16))
         if type(domains) == str:

@@ -39,6 +39,7 @@ def generate_necurs_domain(sequence_nr, magic_nr, date):
 if __name__=="__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-d", "--date", help="as YYYY-mm-dd")
+    parser.add_argument("-n", "--nr", type=int, help="nr of domains to generate")
     args = parser.parse_args()
     date_str = args.date
     if date_str:
@@ -46,5 +47,5 @@ if __name__=="__main__":
     else:
         date = datetime.now() 
 
-    for sequence_nr in range(5000):
+    for sequence_nr in range(args.nr):
         print(generate_necurs_domain(sequence_nr, 9, date))
