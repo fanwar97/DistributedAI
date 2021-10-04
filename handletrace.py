@@ -30,11 +30,12 @@ def do_evaluate(y, probs):
             tmp[i] = 0
     tmp = tmp.astype(int)
     print(tmp)
-    tn, fp, fn, tp = confusion_matrix(
-        y.to_numpy().tolist(), tmp.tolist()).ravel()
-
+    tn, fp, fn, tp = confusion_matrix(y.to_numpy().tolist(), tmp.tolist()).ravel()
     precision = tp/(tp+fp)
     recall = tp/(tp+fn)
+    if(tp == 0):
+        recall = 1
+        precision = 0 if fp > 0 else 1
     f1score = (2*precision*recall)/(precision+recall)
     print("TP: {}\nTN: {}\nFP: {}\nFN: {}\n".format(tp, tn, fp, fn))
     print("FP rate: {}%\nFN rate: {}%\n".format(fp/(fp+tp)*100, fn/(fn+tn)*100))
@@ -42,6 +43,7 @@ def do_evaluate(y, probs):
     print(f"Precision: {precision}")
     print(f"Recal: {recall}")
     print(f"F1-score: {f1score}")
+
 
 def cal_avg(list_of_weight, num_client_this_round):
     global avg_weight
