@@ -13,12 +13,22 @@ class GenerateDGA:
     __limited = ["bazarbackdoor", "chinad", "locky\\dgav2.py", "padcrypt", "pushdo", "qsnatch",
                     "sisron", "tempedreve", "tinba", "unnamed_downloader"]
 
-    def __init__(self, number_of_samples, python_path):
+    ### Number of samples: Final number of generated domains to be output on to .txt
+    ### Gen num = Initial number of domains to be generated before being picked randomly
+    ###             again for the final output
+    def __init__(self, python_path, number_of_samples, gen_num = None):
         self.__org_path = os.getcwd() + "/"
         self.__files = list(glob.glob("generators" + "/**/dga*.py", recursive=True))
         self.__domain_list = []
         self.__number_of_samples = number_of_samples
         self.__python_path = python_path
+        self.__gen_num = gen_num
+        if self.__gen_num:
+            if self.__gen_num < self.__number_of_samples:
+                print("Number of domains to be generate is smaller than number of samples\n"
+                        "Changing it to", self.__number_of_samples)
+        if not self.__gen_num or self.__gen_num < self.__number_of_samples:
+            self.__gen_num = self.__number_of_samples
 
     # Random probability = 1/out_of
     # If the generated samples were not enough, pass a lower out_of argument
@@ -77,6 +87,7 @@ class GenerateDGA:
         if not is_exist:
             print("Algorithm doesn't exist. Please check again!")
         else:
+            print("Generating " + algo_name + " domains...")
             is_dict_based = self.__check_name_in_list(algo_name, self.__dict_based)
             is_limited = self.__check_name_in_list(algo_name, self.__limited)
             if is_limited and not is_dict_based:
@@ -122,9 +133,9 @@ class GenerateDGA:
         """
         if "suppobox" in file:
             self.__run_algorithm([str(random.randint(1,3)), "-n",
-                                str(self.__number_of_samples)], file)
+                                str(self.__gen_num)], file)
         else:
-            self.__run_algorithm(["-n", str(self.__number_of_samples)], file)
+            self.__run_algorithm(["-n", str(self.__gen_num)], file)
 
     def __write_attack_to_file(self, domain_list, output_name):
         """Write the generated samples to a text file"""
@@ -181,29 +192,28 @@ class GenerateDGA:
         """For shiotob"""
         os.chdir(self.__org_path)
         with open("benign.txt", "r", encoding="utf-8") as temp_file:
-            if random.randrange(self.__number_of_samples):
+            if random.randrange(self.__gen_num):
                 temp_file.readline()
             seed_domain = temp_file.readline()
-        self.__run_algorithm([seed_domain, "-n", str(self.__number_of_samples)], file)
+        self.__run_algorithm([seed_domain, "-n", str(self.__gen_num)], file)
 
     def __case_1(self, file):
         """For unknown_malware"""
         choice_list = ["sn", "al"]
-        self.__run_algorithm([random.choice(choice_list), "-n",
-                                str(self.__number_of_samples)], file)
+        self.__run_algorithm([random.choice(choice_list), "-n", str(self.__gen_num)], file)
 
     def __case_2(self, file):
         """For fobber"""
-        self.__run_algorithm([str(random.randint(1,2)), "-n", str(self.__number_of_samples)], file)
+        self.__run_algorithm([str(random.randint(1,2)), "-n", str(self.__gen_num)], file)
 
     def __case_3(self, file):
         """For dircrypt, dnstracker and ramnit"""
-        self.__run_algorithm([str(random.randint(0, self.__number_of_samples)), "-n",
-                                str(self.__number_of_samples)], file)
+        self.__run_algorithm([str(random.randint(0, self.__gen_num)), "-n",
+                                str(self.__gen_num)], file)
 
     def __case_4(self, file):
         """Most of the cases"""
-        self.__run_algorithm(["-n", str(self.__number_of_samples)], file)
+        self.__run_algorithm(["-n", str(self.__gen_num)], file)
 
     @staticmethod
     def __check_name_in_list(name, alist):
@@ -222,12 +232,12 @@ class GenerateDGA:
         return False
 
 if __name__=="__main__":
-    # gen = GenerateDGA(100, ".venv/Scripts/python.exe")
+    # gen = GenerateDGA(".venv/Scripts/python.exe", 100, 200)
     # for i in range(2):
     #     if i == 0:
     #         gen.get_attack_dict_based()
     #     if i == 1:
     #         gen.get_attack_char_based()
 
-    gen = GenerateDGA(5000, ".venv/Scripts/python.exe")
-    gen.get_attack_by_algo("chinad", 10)
+    gen = GenerateDGA(".venv/Scripts/python.exe", 5000, 15000)
+    gen.get_attack_by_algo("gozi", 10)
