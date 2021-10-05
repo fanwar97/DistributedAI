@@ -43,13 +43,10 @@ class GenerateDGA:
         """Get random dict based domains."""
         print("Generating dict based domains...")
         for file in self.__files:
-            is_dict_based = False
-            for element in self.__dict_based:
-                if element in file:
-                    is_dict_based = True
-                    print(file)
-                    break
-            if not is_dict_based:
+            is_dict_based = self.__check_name_list_in_file(self.__dict_based, file)
+            if is_dict_based:
+                print(file)
+            else:
                 continue
             self.__exec_dict_based(file)
         self.__write_attack_to_file(self.__domain_list, "attack_dict_based.txt")
@@ -59,12 +56,8 @@ class GenerateDGA:
         """Get random char based domains"""
         print("Generating char based domains...")
         for file in self.__files:
-            is_char_based = True
-            for element in self.__dict_based:
-                if element in file:
-                    is_char_based = False
-                    break
-            if is_char_based:
+            is_dict_based = self.__check_name_list_in_file(self.__dict_based, file)
+            if not is_dict_based:
                 print(file)
             else:
                 continue
@@ -80,12 +73,12 @@ class GenerateDGA:
         """
         self.__number_of_samples = samples_per_file * number_of_files # Overwriten
         algo_list = os.listdir("generators")
-        is_exist = self.__check_in_list(algo_name, algo_list)
+        is_exist = self.__check_name_in_list(algo_name, algo_list)
         if not is_exist:
             print("Algorithm doesn't exist. Please check again!")
         else:
-            is_dict_based = self.__check_in_list(algo_name, self.__dict_based)
-            is_limited = self.__check_in_list(algo_name, self.__limited)
+            is_dict_based = self.__check_name_in_list(algo_name, self.__dict_based)
+            is_limited = self.__check_name_in_list(algo_name, self.__limited)
             if is_limited and not is_dict_based:
                 print("Please be aware that this algorithm is hardcoded and cannot generate "
                         "any specified number of samples.")
@@ -107,7 +100,6 @@ class GenerateDGA:
 
     def __run_algorithm(self, arguments, file):
         """Run each algorithm script"""
-        is_limited = False
         command_list = [self.__org_path + self.__python_path, os.path.basename(file)]
         command_list.extend(arguments)
         os.chdir(self.__org_path + file.replace(os.path.basename(file), ""))
@@ -118,10 +110,7 @@ class GenerateDGA:
         if len(temp_domain_list) > self.__number_of_samples:
             temp_domain_list = random.sample(temp_domain_list, self.__number_of_samples)
         elif len(temp_domain_list) < self.__number_of_samples:
-            for elem in self.__limited:
-                if elem in file:
-                    is_limited = True
-                    break
+            is_limited = self.__check_name_list_in_file(self.__limited, file)
             if not is_limited:
                 print("Not enough")
         self.__domain_list.extend(temp_domain_list)
@@ -217,10 +206,18 @@ class GenerateDGA:
         self.__run_algorithm(["-n", str(self.__number_of_samples)], file)
 
     @staticmethod
-    def __check_in_list(name, alist):
+    def __check_name_in_list(name, alist):
         """Check if a name is in a list"""
         for elem in alist:
             if name in elem:
+                return True
+        return False
+
+    @staticmethod
+    def __check_name_list_in_file(name_list, file):
+        """Check if a list of names is in a filename"""
+        for elem in name_list:
+            if elem in file:
                 return True
         return False
 
