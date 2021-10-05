@@ -16,6 +16,7 @@ class GenerateDGA:
     ### Number of samples: Final number of generated domains to be output on to .txt
     ### Gen num = Initial number of domains to be generated before being picked randomly
     ###             again for the final output
+    ### NOTE: Gen num > Number of samples
     def __init__(self, python_path, number_of_samples, gen_num = None):
         self.__org_path = os.getcwd() + "/"
         self.__files = list(glob.glob("generators" + "/**/dga*.py", recursive=True))
@@ -76,11 +77,7 @@ class GenerateDGA:
         self.__domain_list.clear()
 
     def get_attack_by_algo(self, algo_name, number_of_files):
-        """
-        Generate attacks by algorithm name\n
-        NOTE: This function will OVERWRITE number_of_samples properties. In order not to make
-        any mistakes, please create an object to only use this function.
-        """
+        """Generate attacks by algorithm name"""
         samples_per_file = math.ceil(self.__number_of_samples / number_of_files)
         algo_list = os.listdir("generators")
         is_exist = self.__check_name_in_list(algo_name, algo_list)
