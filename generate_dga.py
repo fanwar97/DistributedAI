@@ -9,13 +9,13 @@ import subprocess
 
 class GenerateDGA:
     """Class to generate domains"""
+    __dict_based = ["gozi", "nymaim2", "pizd", "suppobox"]
+    __limited = ["bazarbackdoor", "chinad", "locky\\dgav2.py", "padcrypt", "pushdo", "qsnatch",
+                    "sisron", "tempedreve", "tinba", "unnamed_downloader"]
+
     def __init__(self, number_of_samples, python_path):
         self.__org_path = os.getcwd() + "/"
         self.__files = list(glob.glob("generators" + "/**/dga*.py", recursive=True))
-        self.__dict_based = ["gozi", "nymaim2", "pizd", "suppobox"]
-        self.__limited = ["bazarbackdoor", "chinad", "locky\\dgav2.py",
-                            "padcrypt", "pushdo", "qsnatch", "sisron", "tempedreve",
-                            "tinba", "unnamed_downloader"]
         self.__domain_list = []
         self.__number_of_samples = number_of_samples
         self.__python_path = python_path
@@ -65,13 +65,13 @@ class GenerateDGA:
         self.__write_attack_to_file(self.__domain_list, "attack_char_based.txt")
         self.__domain_list.clear()
 
-    def get_attack_by_algo(self, algo_name, samples_per_file, number_of_files):
+    def get_attack_by_algo(self, algo_name, number_of_files):
         """
         Generate attacks by algorithm name\n
         NOTE: This function will OVERWRITE number_of_samples properties. In order not to make
         any mistakes, please create an object to only use this function.
         """
-        self.__number_of_samples = samples_per_file * number_of_files # Overwriten
+        samples_per_file = math.ceil(self.__number_of_samples / number_of_files)
         algo_list = os.listdir("generators")
         is_exist = self.__check_name_in_list(algo_name, algo_list)
         if not is_exist:
@@ -209,7 +209,7 @@ class GenerateDGA:
     def __check_name_in_list(name, alist):
         """Check if a name is in a list"""
         for elem in alist:
-            if name in elem:
+            if name == elem:
                 return True
         return False
 
@@ -229,5 +229,5 @@ if __name__=="__main__":
     #     if i == 1:
     #         gen.get_attack_char_based()
 
-    gen = GenerateDGA(0, ".venv/Scripts/python.exe")
-    gen.get_attack_by_algo("chinad", 500, 10)
+    gen = GenerateDGA(5000, ".venv/Scripts/python.exe")
+    gen.get_attack_by_algo("chinad", 10)
