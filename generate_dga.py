@@ -13,7 +13,7 @@ class GenerateDGA:
         self.__org_path = os.getcwd() + "/"
         self.__files = list(glob.glob("generators" + "/**/dga*.py", recursive=True))
         self.__dict_based = ["gozi", "nymaim2", "pizd", "suppobox"]
-        self.__limited = ["bazarbackdoor\\dga.py", "chinad", "locky\\dgav2.py",
+        self.__limited = ["bazarbackdoor", "chinad", "locky\\dgav2.py",
                             "padcrypt", "pushdo", "qsnatch", "sisron", "tempedreve",
                             "tinba", "unnamed_downloader"]
         self.__domain_list = []
