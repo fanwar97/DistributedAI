@@ -262,7 +262,9 @@ if __name__=="__main__":
                                 "before being randomly sampled again",
                         type=int)
     parser.add_argument("--out_dir",
-                        help="output directory of the generated domains")
+                        help="output directory of the generated domains, "
+                                "default to Client/train_file/",
+                        default="Client/train_file/")
     by_algo = parser.add_argument_group("By algorithm")
     by_algo.add_argument("--algo",
                         help="generate domains by algorithm")
