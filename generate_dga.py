@@ -131,7 +131,10 @@ class GenerateDGA:
         os.chdir(self.__org_path + file.replace(os.path.basename(file), ""))
         with subprocess.Popen(command_list, stdout=subprocess.PIPE) as proc:
             out = proc.communicate()[0]
-        temp_domain_list = out.decode("utf-8").split("\r\n")
+        if os.name == "nt":
+            temp_domain_list = out.decode("utf-8").split("\r\n")
+        else:
+            temp_domain_list = out.decode("utf-8").split("\n")
         temp_domain_list.pop()
         if len(temp_domain_list) > self.__number_of_samples:
             temp_domain_list = random.sample(temp_domain_list, self.__number_of_samples)
