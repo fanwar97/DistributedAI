@@ -27,7 +27,7 @@ class GenerateDGA:
     ###
     def __init__(self, python_path, number_of_samples, gen_num = None, output_dir = None):
         self.__domain_list = []
-        self.__temp_list = []
+        self.__multiple_list = []
         self.__number_of_samples = number_of_samples
         self.__python_path = python_path
         self.__gen_num = gen_num
@@ -72,7 +72,7 @@ class GenerateDGA:
         """Get random dict based domains."""
         print("Generating dict based domains...")
         for file in self.__files:
-            is_dict_based = self.__check_name_list_in_file(self.__dict_based, file)
+            is_dict_based = self.__check_name_list_in_file(self.__dict_based, file)[0]
             if is_dict_based:
                 print(file)
             else:
@@ -85,17 +85,16 @@ class GenerateDGA:
     def get_attack_char_based(self):
         """Get random char based domains"""
         print("Generating char based domains...")
-        for elem in self.__multiple:
-            for file in self.__files:
-                if elem in file:
-                    print(file)
-                    self.__exec_char_based(self.__convert_path(file))
-            self.__process_multiple()
-            self.__temp_list.clear()
+        current_multiple = None
         for file in self.__files:
-            is_dict_based = self.__check_name_list_in_file(self.__dict_based, file)
-            is_multiple = self.__check_name_list_in_file(self.__multiple, file)
-            if not is_dict_based and not is_multiple:
+            which_mul = self.__check_name_list_in_file(self.__multiple, file)[1]
+            if current_multiple != which_mul:
+                if self.__multiple_list:
+                    self.__process_multiple()
+                    self.__multiple_list.clear()
+                current_multiple = which_mul
+            is_dict_based = self.__check_name_list_in_file(self.__dict_based, file)[0]
+            if not is_dict_based:
                 print(file)
             else:
                 continue
@@ -134,7 +133,7 @@ class GenerateDGA:
                 self.__write_attack_to_file(temp_list, self.__output_dir + algo_name + "_" +
                                             str(samples_per_file) + "_" +
                                             str(index+1).zfill(2) + ".txt")
-            self.__temp_list.clear()
+            self.__multiple_list.clear()
             self.__domain_list.clear()
 
     def __run_algorithm(self, arguments, file):
@@ -152,12 +151,12 @@ class GenerateDGA:
         if len(temp_domain_list) > self.__number_of_samples:
             temp_domain_list = random.sample(temp_domain_list, self.__number_of_samples)
         elif len(temp_domain_list) < self.__number_of_samples:
-            is_limited = self.__check_name_list_in_file(self.__limited, file)
+            is_limited = self.__check_name_list_in_file(self.__limited, file)[0]
             if not is_limited:
                 print("Not enough samples were generated. Generated:", len(temp_domain_list))
-        is_multiple = self.__check_name_list_in_file(self.__multiple, file)
+        is_multiple = self.__check_name_list_in_file(self.__multiple, file)[0]
         if is_multiple:
-            self.__temp_list.extend(temp_domain_list)
+            self.__multiple_list.extend(temp_domain_list)
         else:
             self.__domain_list.extend(temp_domain_list)
 
@@ -251,10 +250,10 @@ class GenerateDGA:
 
     def __process_multiple(self):
         """Process algorithm that have multiple scripts"""
-        if len(self.__temp_list) <= self.__number_of_samples:
-            self.__domain_list.extend(self.__temp_list)
+        if len(self.__multiple_list) <= self.__number_of_samples:
+            self.__domain_list.extend(self.__multiple_list)
         else:
-            self.__domain_list.extend(random.sample(self.__temp_list, self.__number_of_samples))
+            self.__domain_list.extend(random.sample(self.__multiple_list, self.__number_of_samples))
 
     @staticmethod
     def __check_name_in_list(name, alist):
@@ -269,8 +268,8 @@ class GenerateDGA:
         """Check if a list of names is in a filename"""
         for elem in name_list:
             if elem in file:
-                return True
-        return False
+                return True, elem
+        return False, None
 
     @staticmethod
     def __convert_path(path):
