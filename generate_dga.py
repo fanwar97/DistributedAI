@@ -167,8 +167,7 @@ class GenerateDGA:
         This function evaluates algorithm name and execute with corresponding params.
         """
         if "suppobox" in file:
-            self.__run_algorithm([str(random.randint(1,3)), "-n",
-                                str(self.__gen_num)], file)
+            self.__run_algorithm([str(random.randint(1,3)), "-n", str(self.__gen_num)], file)
         else:
             self.__run_algorithm(["-n", str(self.__gen_num)], file)
 
