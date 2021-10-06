@@ -118,7 +118,7 @@ class GenerateDGA:
             if len(self.__domain_list) < self.__number_of_samples:
                 number_of_files = math.ceil(len(self.__domain_list) / samples_per_file)
             for index in range(number_of_files):
-                temp_list = self.__domain_list[index*samples_per_file:(index+1)*samples_per_file-1]
+                temp_list = self.__domain_list[index*samples_per_file:(index+1)*samples_per_file]
                 self.__write_attack_to_file(temp_list, self.__output_dir + algo_name + "_" +
                                             str(samples_per_file) + "_" +
                                             str(index+1).zfill(2) + ".txt")
