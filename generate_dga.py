@@ -128,6 +128,7 @@ class GenerateDGA:
                         self.__exec_dict_based(self.__convert_path(file))
             if self.__multiple_list:
                 self.__process_multiple()
+                self.__multiple_list.clear()
             if len(self.__domain_list) < self.__number_of_samples:
                 number_of_files = math.ceil(len(self.__domain_list) / samples_per_file)
             for index in range(number_of_files):
@@ -135,7 +136,6 @@ class GenerateDGA:
                 self.__write_attack_to_file(temp_list, self.__output_dir + algo_name + "_" +
                                             str(samples_per_file) + "_" +
                                             str(index+1).zfill(2) + ".txt")
-            self.__multiple_list.clear()
             self.__domain_list.clear()
 
     def __run_algorithm(self, arguments, file):
