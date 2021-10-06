@@ -47,7 +47,7 @@ class GenerateDGA:
                         "Changing it to", self.__number_of_samples)
         if not self.__gen_num or self.__gen_num < self.__number_of_samples:
             self.__gen_num = self.__number_of_samples
-            
+
     ###
     # Random probability = 1/out_of
     # If the generated samples were not enough, pass a lower out_of argument
