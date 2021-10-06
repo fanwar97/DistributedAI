@@ -1,6 +1,7 @@
 """
 Module to generate DGAs
 """
+import argparse
 import glob
 import math
 import os
@@ -10,30 +11,42 @@ import subprocess
 class GenerateDGA:
     """Class to generate domains"""
     __dict_based = ["gozi", "nymaim2", "pizd", "suppobox"]
-    __limited = ["bazarbackdoor", "chinad", "locky\\dgav2.py", "padcrypt", "pushdo", "qsnatch",
+    __limited = ["bazarbackdoor", "chinad", "locky/dgav2.py", "padcrypt", "pushdo", "qsnatch",
                     "sisron", "tempedreve", "tinba", "unnamed_downloader"]
 
-    ### Number of samples: Final number of generated domains to be output on to .txt
-    ### Gen num = Initial number of domains to be generated before being picked randomly
-    ###             again for the final output
-    ### NOTE: Gen num > Number of samples
-    def __init__(self, python_path, number_of_samples, gen_num = None):
+    ###
+    # Number of samples: Final number of generated domains by each algorithm
+    #                       to be output on to .txt
+    # Gen num: Initial number of domains to be generated before being picked randomly
+    #             again for the final output
+    # NOTE: Gen num > Number of samples
+    ###
+    def __init__(self, python_path, number_of_samples, gen_num = None, output_dir = None):
         self.__org_path = os.getcwd() + "/"
         self.__files = list(glob.glob("generators" + "/**/dga*.py", recursive=True))
         self.__domain_list = []
         self.__number_of_samples = number_of_samples
         self.__python_path = python_path
         self.__gen_num = gen_num
+        self.__output_dir = output_dir
+        if not self.__output_dir:
+            self.__output_dir = ""
+        else:
+            if not self.__output_dir.endswith("\\") or not self.__output_dir.endswith("/"):
+                self.__output_dir = self.__output_dir + "/"
+            if not os.path.isdir(self.__output_dir):
+                os.makedirs(self.__output_dir)
         if self.__gen_num:
             if self.__gen_num < self.__number_of_samples:
                 print("Number of domains to be generate is smaller than number of samples\n"
                         "Changing it to", self.__number_of_samples)
         if not self.__gen_num or self.__gen_num < self.__number_of_samples:
             self.__gen_num = self.__number_of_samples
-
+    ###
     # Random probability = 1/out_of
     # If the generated samples were not enough, pass a lower out_of argument
     # Currently default at 100
+    ###
     def get_benign(self, out_of = 100):
         """Get random benign domains"""
         print("Generating benign domains...")
@@ -59,8 +72,9 @@ class GenerateDGA:
                 print(file)
             else:
                 continue
-            self.__exec_dict_based(file)
-        self.__write_attack_to_file(self.__domain_list, "attack_dict_based.txt")
+            self.__exec_dict_based(self.__convert_path(file))
+        self.__write_attack_to_file(self.__domain_list, self.__output_dir +
+                                                        "attack_dict_based.txt")
         self.__domain_list.clear()
 
     def get_attack_char_based(self):
@@ -72,8 +86,9 @@ class GenerateDGA:
                 print(file)
             else:
                 continue
-            self.__exec_char_based(file)
-        self.__write_attack_to_file(self.__domain_list, "attack_char_based.txt")
+            self.__exec_char_based(self.__convert_path(file))
+        self.__write_attack_to_file(self.__domain_list, self.__output_dir +
+                                                        "attack_char_based.txt")
         self.__domain_list.clear()
 
     def get_attack_by_algo(self, algo_name, number_of_files):
@@ -88,22 +103,23 @@ class GenerateDGA:
             is_dict_based = self.__check_name_in_list(algo_name, self.__dict_based)
             is_limited = self.__check_name_in_list(algo_name, self.__limited)
             if is_limited and not is_dict_based:
-                print("Please be aware that this algorithm is hardcoded and cannot generate "
-                        "any specified number of samples.")
-                print("Numbers of generated files can be less than expected.")
+                print("Please be aware that some scripts in this algorithm are hardcoded "
+                        "and cannot generate any specified number of samples.\n"
+                        "Number of generated files can be less than expected.")
             for file in self.__files:
                 if algo_name in file:
+                    print(file)
                     if not is_dict_based:
-                        self.__exec_char_based(file)
+                        self.__exec_char_based(self.__convert_path(file))
                     else:
-                        self.__exec_dict_based(file)
-                    break
+                        self.__exec_dict_based(self.__convert_path(file))
             if len(self.__domain_list) < self.__number_of_samples:
                 number_of_files = math.ceil(len(self.__domain_list) / samples_per_file)
             for index in range(number_of_files):
                 temp_list = self.__domain_list[index*samples_per_file:(index+1)*samples_per_file-1]
-                self.__write_attack_to_file(temp_list, algo_name + "_" + str(samples_per_file)
-                                            + "_" + str(index+1).zfill(2) + ".txt")
+                self.__write_attack_to_file(temp_list, self.__output_dir + algo_name + "_" +
+                                            str(samples_per_file) + "_" +
+                                            str(index+1).zfill(2) + ".txt")
             self.__domain_list.clear()
 
     def __run_algorithm(self, arguments, file):
@@ -154,7 +170,7 @@ class GenerateDGA:
             "fobber": lambda: self.__case_2(file),
             "fosniw": lambda: self.__case_4(file),
             "kraken": lambda: self.__case_4(file),
-            "locky\\dgav3.py": lambda: self.__case_4(file),
+            "locky/dgav3.py": lambda: self.__case_4(file),
             "murofet": lambda: self.__case_4(file),
             "mydoom": lambda: self.__case_4(file),
             "necurs": lambda: self.__case_4(file),
@@ -216,7 +232,7 @@ class GenerateDGA:
     def __check_name_in_list(name, alist):
         """Check if a name is in a list"""
         for elem in alist:
-            if name == elem:
+            if name in elem:
                 return True
         return False
 
@@ -228,13 +244,41 @@ class GenerateDGA:
                 return True
         return False
 
-if __name__=="__main__":
-    # gen = GenerateDGA(".venv/Scripts/python.exe", 100, 200)
-    # for i in range(2):
-    #     if i == 0:
-    #         gen.get_attack_dict_based()
-    #     if i == 1:
-    #         gen.get_attack_char_based()
+    @staticmethod
+    def __convert_path(path):
+        """Process path if the running OS is Windows"""
+        if os.name == "nt":
+            return path.replace("\\", "/")
+        return path
 
-    gen = GenerateDGA(".venv/Scripts/python.exe", 5000, 15000)
-    gen.get_attack_by_algo("gozi", 10)
+if __name__=="__main__":
+    parser = argparse.ArgumentParser(description="Generate DGAs randomly")
+    parser.add_argument("samples", type=int, help="Samples per algorithm")
+    parser.add_argument("--py_path",
+                        help="python path to run algorithm scripts, default to /usr/bin/python3",
+                        default= "/usr/bin/python3")
+    parser.add_argument("--init_num",
+                        help="initial number of generated domains "
+                                "before being randomly sampled again",
+                        type=int)
+    parser.add_argument("--out_dir",
+                        help="output directory of the generated domains")
+    by_algo = parser.add_argument_group("By algorithm")
+    by_algo.add_argument("--algo",
+                        help="generate domains by algorithm")
+    by_algo.add_argument("--file_num",
+                        help="number of files to be divided into",
+                        type=int)
+    args = parser.parse_args()
+
+    gen = GenerateDGA(args.py_path, args.samples, args.init_num, args.out_dir)
+    if args.algo and args.file_num:
+        gen.get_attack_by_algo(args.algo, args.file_num)
+    elif args.algo or args.file_num:
+        parser.error("Both --algo and --file_num flags must be specified together.")
+    else:
+        for i in range(2):
+            if i == 0:
+                gen.get_attack_dict_based()
+            if i == 1:
+                gen.get_attack_char_based()
