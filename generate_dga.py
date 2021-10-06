@@ -126,7 +126,8 @@ class GenerateDGA:
                         self.__exec_char_based(self.__convert_path(file))
                     else:
                         self.__exec_dict_based(self.__convert_path(file))
-            self.__process_multiple()
+            if self.__multiple_list:
+                self.__process_multiple()
             if len(self.__domain_list) < self.__number_of_samples:
                 number_of_files = math.ceil(len(self.__domain_list) / samples_per_file)
             for index in range(number_of_files):
