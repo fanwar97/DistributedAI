@@ -10,9 +10,13 @@ import subprocess
 
 class GenerateDGA:
     """Class to generate domains"""
+    __org_path = os.getcwd() + "/"
+    __files = list(glob.glob("generators" + "/**/dga*.py", recursive=True))
     __dict_based = ["gozi", "nymaim2", "pizd", "suppobox"]
-    __limited = ["bazarbackdoor", "chinad", "locky/dgav2.py", "padcrypt", "pushdo", "qsnatch",
+    __limited = ["bazarbackdoor", "chinad", "locky", "padcrypt", "pushdo", "qsnatch",
                     "sisron", "tempedreve", "tinba", "unnamed_downloader"]
+    __multiple = ["bazarbackdoor", "kraken", "locky", "murofet", "necurs", "pykspa", "qsnatch",
+                    "vawtrak"]
 
     ###
     # Number of samples: Final number of generated domains by each algorithm
@@ -22,9 +26,8 @@ class GenerateDGA:
     # NOTE: Gen num > Number of samples
     ###
     def __init__(self, python_path, number_of_samples, gen_num = None, output_dir = None):
-        self.__org_path = os.getcwd() + "/"
-        self.__files = list(glob.glob("generators" + "/**/dga*.py", recursive=True))
         self.__domain_list = []
+        self.__temp_list = []
         self.__number_of_samples = number_of_samples
         self.__python_path = python_path
         self.__gen_num = gen_num
@@ -82,9 +85,17 @@ class GenerateDGA:
     def get_attack_char_based(self):
         """Get random char based domains"""
         print("Generating char based domains...")
+        for elem in self.__multiple:
+            for file in self.__files:
+                if elem in file:
+                    print(file)
+                    self.__exec_char_based(self.__convert_path(file))
+            self.__process_multiple()
+            self.__temp_list.clear()
         for file in self.__files:
             is_dict_based = self.__check_name_list_in_file(self.__dict_based, file)
-            if not is_dict_based:
+            is_multiple = self.__check_name_list_in_file(self.__multiple, file)
+            if not is_dict_based and not is_multiple:
                 print(file)
             else:
                 continue
@@ -115,6 +126,7 @@ class GenerateDGA:
                         self.__exec_char_based(self.__convert_path(file))
                     else:
                         self.__exec_dict_based(self.__convert_path(file))
+            self.__process_multiple()
             if len(self.__domain_list) < self.__number_of_samples:
                 number_of_files = math.ceil(len(self.__domain_list) / samples_per_file)
             for index in range(number_of_files):
@@ -122,6 +134,7 @@ class GenerateDGA:
                 self.__write_attack_to_file(temp_list, self.__output_dir + algo_name + "_" +
                                             str(samples_per_file) + "_" +
                                             str(index+1).zfill(2) + ".txt")
+            self.__temp_list.clear()
             self.__domain_list.clear()
 
     def __run_algorithm(self, arguments, file):
@@ -141,8 +154,12 @@ class GenerateDGA:
         elif len(temp_domain_list) < self.__number_of_samples:
             is_limited = self.__check_name_list_in_file(self.__limited, file)
             if not is_limited:
-                print("Not enough")
-        self.__domain_list.extend(temp_domain_list)
+                print("Not enough samples were generated. Generated:", len(temp_domain_list))
+        is_multiple = self.__check_name_list_in_file(self.__multiple, file)
+        if is_multiple:
+            self.__temp_list.extend(temp_domain_list)
+        else:
+            self.__domain_list.extend(temp_domain_list)
 
     def __exec_dict_based(self, file):
         """
@@ -232,6 +249,13 @@ class GenerateDGA:
     def __case_4(self, file):
         """Most of the cases"""
         self.__run_algorithm(["-n", str(self.__gen_num)], file)
+
+    def __process_multiple(self):
+        """Process algorithm that have multiple scripts"""
+        if len(self.__temp_list) <= self.__number_of_samples:
+            self.__domain_list.extend(self.__temp_list)
+        else:
+            self.__domain_list.extend(random.sample(self.__temp_list, self.__number_of_samples))
 
     @staticmethod
     def __check_name_in_list(name, alist):
