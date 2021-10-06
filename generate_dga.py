@@ -141,7 +141,7 @@ class GenerateDGA:
         """Run each algorithm script"""
         command_list = [self.__python_path, os.path.basename(file)]
         command_list.extend(arguments)
-        os.chdir(self.__org_path + file.replace(os.path.basename(file), ""))
+        os.chdir(self.__org_path + os.path.dirname(file))
         with subprocess.Popen(command_list, stdout=subprocess.PIPE) as proc:
             out = proc.communicate()[0]
         if os.name == "nt":
