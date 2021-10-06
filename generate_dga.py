@@ -48,20 +48,15 @@ class GenerateDGA:
         if not self.__gen_num or self.__gen_num < self.__number_of_samples:
             self.__gen_num = self.__number_of_samples
 
-    ###
-    # Random probability = 1/out_of
-    # If the generated samples were not enough, pass a lower out_of argument
-    # Currently default at 100
-    ###
-    def get_benign(self, out_of = 100):
+    def get_benign(self):
         """Get random benign domains"""
         print("Generating benign domains...")
         with open(self.__org_path + "benign.txt", "r", encoding="utf-8") as file1:
             counter = 0
-            with open("benign_" + str(self.__number_of_samples) + ".txt", "w",
+            with open(self.__output_dir + "benign_" + str(self.__number_of_samples) + ".txt", "w",
                         encoding="utf-8") as file2:
                 for aline in file1:
-                    if random.randrange(out_of):
+                    if random.randrange(round(pow(10, 5) / self.__number_of_samples)):
                         continue
                     file2.write(aline)
                     counter += 1
@@ -227,7 +222,7 @@ class GenerateDGA:
         """For shiotob"""
         os.chdir(self.__org_path)
         with open("benign.txt", "r", encoding="utf-8") as temp_file:
-            if random.randrange(self.__gen_num):
+            while random.randrange(self.__gen_num):
                 temp_file.readline()
             seed_domain = temp_file.readline()
         self.__run_algorithm([seed_domain, "-n", str(self.__gen_num)], file)
@@ -282,7 +277,7 @@ class GenerateDGA:
 
 if __name__=="__main__":
     parser = argparse.ArgumentParser(description="Generate DGAs randomly")
-    parser.add_argument("samples", type=int, help="Samples per algorithm")
+    parser.add_argument("samples", type=int, help="samples per algorithm")
     parser.add_argument("--py_path",
                         help="python path to run algorithm scripts, default to /usr/bin/python3",
                         default= "/usr/bin/python3")
@@ -294,7 +289,7 @@ if __name__=="__main__":
                         help="output directory of the generated domains, "
                                 "default to Client/train_file/",
                         default="Client/train_file/")
-    by_algo = parser.add_argument_group("By algorithm")
+    by_algo = parser.add_argument_group("by algorithm")
     by_algo.add_argument("--algo",
                         help="generate domains by algorithm")
     by_algo.add_argument("--file_num",
@@ -303,6 +298,7 @@ if __name__=="__main__":
     args = parser.parse_args()
 
     gen = GenerateDGA(args.py_path, args.samples, args.init_num, args.out_dir)
+    gen.get_benign()
     if args.algo and args.file_num:
         gen.get_attack_by_algo(args.algo, args.file_num)
     elif args.algo or args.file_num:
