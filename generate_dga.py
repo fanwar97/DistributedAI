@@ -29,6 +29,8 @@ class GenerateDGA:
         self.__python_path = python_path
         self.__gen_num = gen_num
         self.__output_dir = output_dir
+        if not os.path.isabs(self.__python_path):
+            self.__python_path = os.path.abspath("") + "/" + self.__python_path
         if not self.__output_dir:
             self.__output_dir = ""
         else:
@@ -124,7 +126,7 @@ class GenerateDGA:
 
     def __run_algorithm(self, arguments, file):
         """Run each algorithm script"""
-        command_list = [self.__org_path + self.__python_path, os.path.basename(file)]
+        command_list = [self.__python_path, os.path.basename(file)]
         command_list.extend(arguments)
         os.chdir(self.__org_path + file.replace(os.path.basename(file), ""))
         with subprocess.Popen(command_list, stdout=subprocess.PIPE) as proc:
