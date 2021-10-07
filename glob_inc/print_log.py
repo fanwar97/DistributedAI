@@ -1,5 +1,5 @@
 import time
-from color import color
+from .color import color
 
 def find_color(color_):
     if color_ == "red":

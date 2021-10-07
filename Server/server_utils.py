@@ -7,7 +7,7 @@ import struct
 
 from glob_inc.print_log import print_log
 from glob_inc.utils import *
-from glob_inc.color import color
+
 def recvall(sock, n):
     # Helper function to recv n bytes or return None if EOF is hit
     data = bytearray()

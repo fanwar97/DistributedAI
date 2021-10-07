@@ -1,4 +1,3 @@
-import socket
 from glob_inc.print_log import print_log
 from glob_inc.utils import *
 import pickle

@@ -2,10 +2,12 @@
 import socket
 import threading
 import time
-import pickle
+import sys
 import math
-
+import os
 from sklearn.neural_network import MLPClassifier
+
+sys.path.insert(0, os.getcwd() + "/../")
 
 from server_utils import *
 from glob_inc.print_log import print_log
@@ -15,7 +17,10 @@ def remain_to_fl(start_time, duration):
     cur_time = time.time()
     remain_time = duration*60 - (cur_time - start_time)
     remain_time = math.floor(remain_time)
-    return remain_time
+    if remain_time < 0:
+        return 0
+    else:
+        return remain_time
 
 def handle_hello_msg(conn, addr):
     global id_ip_map_list
@@ -102,8 +107,8 @@ def cal_avg():
             list_of_weight[0][i] += list_of_weight[j][i]
         list_of_weight[0][i] /= num_clients_this_round 
     avg_weight = list_of_weight[0]
-    print_log(f"avg_weight for this round is:")
-    print(avg_weight)    
+    # print_log(f"avg_weight for this round is:")
+    # print(avg_weight)    
     avg_weight_ready = 1
 
 def is_time_to_avg():
@@ -146,8 +151,6 @@ def stop_federated_learning():
     num_clients_this_round = 0
     num_clients_upt_this_round = 0
     is_flearn_time = False
-    avg_weight_ready = 0
-    avg_weight = []
     print("STOP FEDERATED LEARNING ROUND")    
     t = threading.Timer(WAIT_TIME * 60, start_federated_learning)
     t.start()
@@ -155,6 +158,10 @@ def stop_federated_learning():
 def start_federated_learning():
     global is_flearn_time
     global start_wait_time
+    global avg_weight_ready
+    global avg_weight
+    avg_weight = []
+    avg_weight_ready = 0
     is_flearn_time = True
     print("START FEDERATED LEARNING ROUND")
     t = threading.Timer(FL_DUR * 60, stop_federated_learning)
@@ -162,9 +169,9 @@ def start_federated_learning():
 
 if __name__ == '__main__':
     MAX_CLIENT = 20
-    WAIT_TIME = 2
-    FL_DUR = 2
-    gmodel_path = "my_model_new"
+    WAIT_TIME = 1
+    FL_DUR = 1
+    gmodel_path = os.getcwd() + "/global_model/my_model_new"
     cur_model_info = [0, 0, b'0.0']
     avg_weight_ready = 0
     num_clients_this_round = 0

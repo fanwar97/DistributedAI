@@ -4,7 +4,6 @@ from scapy.all import *
 from scapy.layers.dns import *
 import tldextract
 from threading import *
-import struct
 
 from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import StandardScaler
@@ -13,13 +12,12 @@ from sklearn.neural_network import MLPClassifier
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import classification_report
 import tensorflow as tf
-from tensorflow import keras
-from tensorflow.keras import layers
 
 from glob_inc.print_log import print_log
-from message import *
 from glob_inc.utils import *
+from message import *
 from model import *
+from random_sutff_for_practice.handletrace import test_with_dic_based_atk
 
 # validChars = {chr(i+45):i for i in range(0,78)}
 
@@ -51,52 +49,57 @@ def handle_packet(queue, mutex):
                 enqueue(queue, mutex, dns.domain)
     return find_domain
 
-def update_current_model(avg_weight, cur_model_info, cur_model_file):
-    # if cur_model_info[0] == "wait_for_load":
-    #     g_model = tf.keras.models.load_model(cur_model_file)
-    #     g_model.summary()
-    #     cur_model_info[1] = g_model
-    #     cur_model_info[0] = "updated"
-    #     return
+def update_current_model(avg_weight, cur_model_info, round_counter):
     current_model = cur_model_info[1]
+    test_with_dic_based_atk(current_model, round_counter, 1)
     current_model.set_weights(avg_weight)
+    test_with_dic_based_atk(current_model, round_counter, 0)
     cur_model_info[1] = current_model
 
 def train_current_model(cur_model_info, train_file):
     if isinstance(cur_model_info[1], int): 
-        current_model = tf.keras.models.load_model("simple_LSTM_model")  
+        current_model = tf.keras.models.load_model(os.getcwd() + "/client_model/simple_LSTM_model")  
     else:     
         current_model = cur_model_info[1]
     
-    ret = do_train_model(current_model, train_file)
-    # left it empty here for further update
+    ret, model_after_train = do_train_model(current_model, train_file)
+    cur_model_info[1] = model_after_train
     return ret
 
 def is_new_model_required(cur_model_info, lastest_model_ver):
     lastest_model_ver = float(lastest_model_ver)
     cur_model_ver = cur_model_info[2]
     print(f"{cur_model_ver}, {lastest_model_ver}")
-    if lastest_model_ver > cur_model_ver:
+    float_cur_model_ver = cur_model_ver
+    if isinstance(cur_model_ver, int) == False:
+        str_cur_model_ver = cur_model_ver.decode('utf-8')
+        float_cur_model_ver = float(str_cur_model_ver)
+    if lastest_model_ver > float_cur_model_ver:
         return True
     return False
 
-def fed_learn_process(host, port, train_file, client_id, cur_model_info, cur_model_file, is_exit, time_to_fl):
+def fed_learn_process(host, port, train_file, client_id, cur_model_info, cur_model_file, is_exit, period, round_counter):
 
     if is_exit == True:
         return
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.connect((host, port))
-    print_log(f"Client {client_id} has started federated learning proc with server", "green")
 
+    print_log(f"Client {client_id} has sent federated learning req to server", "green")
     send_flearn_request(sock, client_id)
     lastest_model_ver, time_to_fl_from_sv = recv_flearn_population(sock)
     if lastest_model_ver == b'rejected':
-        print("client rejected")
-        t = Timer(time_to_fl_from_sv, fed_learn_process, args=(host, port, train_file, client_id, cur_model_info, cur_model_file, is_exit, time_to_fl_from_sv))
+        print_log("client rejected", "red")
+        t = Timer(time_to_fl_from_sv, fed_learn_process, args=(host, port, train_file, client_id, cur_model_info, cur_model_file, is_exit, period, round_counter))
+        print(f"Start FL request in {time_to_fl_from_sv}")
         t.start()
         sock.close()
         return
+    time_start_this_round = time.time()
+    round_counter += 1
+    print_log(f"START ROUND {round_counter}")
+    file = choose_file_in_folder_by_order(train_file, round_counter - 1)
     if is_new_model_required(cur_model_info, lastest_model_ver) == True:
         cur_model_info[0] = "updating"
         send_model_request(sock, lastest_model_ver, client_id)
@@ -104,23 +107,29 @@ def fed_learn_process(host, port, train_file, client_id, cur_model_info, cur_mod
         cur_model_info[0] = "wait_for_load"
         cur_model_info[2] = lastest_model_ver
         g_model = tf.keras.models.load_model(cur_model_file)
-        g_model.summary()
+        # g_model.summary()
         cur_model_info[1] = g_model
         cur_model_info[0] = "updated"
     else:
         send_model_fine(sock, client_id)
 
     if wait_for_training_command(sock) == True:
-        updated_weights = train_current_model(cur_model_info, train_file)
+        updated_weights = train_current_model(cur_model_info, file)
+    else:
+        print_log("Something wrong with training command", "red")
+        sock.close()
+        return  
     send_weight(sock, updated_weights, client_id)
     avg_weight = recv_weight(sock)
     sock.close()
-    update_current_model(avg_weight, cur_model_info, cur_model_file)
-    
+    time_end_this_round = time.time()
+    print_log(f"END ROUND {round_counter}")
     if is_exit == True:
         return
-    t = Timer(time_to_fl, fed_learn_process, args=(host, port, train_file, client_id, cur_model_info, cur_model_file, is_exit, time_to_fl))
+    t = Timer(period + (period - math.floor(time_end_this_round - time_start_this_round)), fed_learn_process, args=(host, port, train_file, client_id, cur_model_info, cur_model_file, is_exit, period, round_counter))
     t.start()
+    update_current_model(avg_weight, cur_model_info, round_counter)
+    
 
 def do_hello_process(host, port, client_id):
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
