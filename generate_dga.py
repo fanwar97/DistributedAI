@@ -298,7 +298,6 @@ if __name__=="__main__":
     args = parser.parse_args()
 
     gen = GenerateDGA(args.py_path, args.samples, args.init_num, args.out_dir)
-    gen.get_benign()
     if args.algo and args.file_num:
         gen.get_attack_by_algo(args.algo, args.file_num)
     elif args.algo or args.file_num:
