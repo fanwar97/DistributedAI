@@ -6,6 +6,7 @@ import sys
 import math
 import os
 from sklearn.neural_network import MLPClassifier
+import numpy as np
 
 sys.path.insert(0, os.getcwd() + "/../")
 
@@ -102,13 +103,14 @@ def cal_avg():
     for i in range(MAX_CLIENT):
         if updated_weight_list[i] != -1:
             list_of_weight.append(updated_weight_list[i])
-    for i in range(len(list_of_weight[0])):
-        for j in range(1, len(list_of_weight) - 1):
-            list_of_weight[0][i] += list_of_weight[j][i]
-        list_of_weight[0][i] /= num_clients_this_round 
-    avg_weight = list_of_weight[0]
+    # for i in range(len(list_of_weight[0])):
+    #     for j in range(1, len(list_of_weight) - 1):
+    #         list_of_weight[0][i] += list_of_weight[j][i]
+    #     list_of_weight[0][i] /= num_clients_this_round 
+    # avg_weight = list_of_weight[0]
     # print_log(f"avg_weight for this round is:")
     # print(avg_weight)    
+    avg_weight = np.mean(list_of_weight, axis=0)
     avg_weight_ready = 1
 
 def is_time_to_avg():
@@ -190,7 +192,7 @@ if __name__ == '__main__':
         # thread_list.append(avg_thread)
         # avg_thread.start()
 
-        host = "localhost"
+        host = "10.147.17.111"
         port = 12345
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.bind((host, port))   

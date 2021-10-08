@@ -17,7 +17,7 @@ from glob_inc.print_log import print_log
 from glob_inc.utils import *
 from message import *
 from model import *
-from random_sutff_for_practice.handletrace import test_with_dic_based_atk
+from random_stuff_for_practice.handletrace import test_with_dic_based_atk
 
 # validChars = {chr(i+45):i for i in range(0,78)}
 
