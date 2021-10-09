@@ -256,7 +256,7 @@ class GenerateDGA:
     def __check_name_in_list(name, alist):
         """Check if a name is in a list"""
         for elem in alist:
-            if name in elem:
+            if name == elem:
                 return True
         return False
 
