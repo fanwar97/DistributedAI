@@ -103,7 +103,7 @@ class LogToExcel:
 
 if __name__=="__main__":
     parser = argparse.ArgumentParser(description="Parse training log files to .xlsx")
-    parser.add_argument("sample_per_round", type=int, help="samples per round")
+    parser.add_argument("samples_per_round", type=int, help="samples per round")
     parser.add_argument("number_of_rounds", type=int, help="number of rounds")
     args = parser.parse_args()
 
