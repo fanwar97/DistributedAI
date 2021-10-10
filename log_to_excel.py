@@ -48,15 +48,15 @@ class LogToExcel:
             for i, elem in enumerate(self.__algo_list):
                 wsheet.merge_cells(start_row=2*(i+1), start_column=1,
                                     end_row=2*(i+1)+1, end_column=1)
-                wsheet["A" + str(2*(i+1))].alignment = Alignment(horizontal="center",
+                wsheet.cell(2*(i+1), 1).alignment = Alignment(horizontal="center",
                                                                     vertical="center")
-                wsheet["A" + str(2*(i+1))] = elem
-                wsheet["B" + str(2*(i+1))].alignment = Alignment(horizontal="center",
+                wsheet.cell(2*(i+1), 1).value = elem
+                wsheet.cell(2*(i+1), 2).alignment = Alignment(horizontal="center",
                                                                     vertical="center")
-                wsheet["B" + str(2*(i+1))] = "before"
-                wsheet["B" + str(2*(i+1)+1)].alignment = Alignment(horizontal="center",
+                wsheet.cell(2*(i+1), 2).value = "before"
+                wsheet.cell(2*(i+1)+1, 2).alignment = Alignment(horizontal="center",
                                                                     vertical="center")
-                wsheet["B" + str(2*(i+1)+1)] = "after"
+                wsheet.cell(2*(i+1)+1, 2).value = "after"
                 j = 0
                 for col in wsheet.iter_cols(min_row=2*(i+1), min_col=3,
                                         max_row=2*(i+1)+1, max_col=self.__number_of_rounds+2):
