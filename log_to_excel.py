@@ -107,5 +107,5 @@ if __name__=="__main__":
     parser.add_argument("number_of_rounds", type=int, help="number of rounds")
     args = parser.parse_args()
 
-    to_log = LogToExcel(args.sample_per_round, args.number_of_rounds)
+    to_log = LogToExcel(args.samples_per_round, args.number_of_rounds)
     to_log.to_excel()
