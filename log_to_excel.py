@@ -7,7 +7,7 @@ import pathlib
 import re
 
 from openpyxl import Workbook
-from openpyxl.styles import Alignment
+from openpyxl.styles import Alignment, Border, Side, Font
 from openpyxl.utils import get_column_letter
 
 
@@ -38,6 +38,13 @@ class LogToExcel:
         else:
             wbook = Workbook()
             wsheet = wbook.active
+            wsheet.merge_cells(start_row=1, start_column=1,
+                                    end_row=2, end_column=1)
+            wsheet.cell(1, 1).alignment = Alignment(wrapText=True)
+            wsheet.cell(1, 1).border = Border(diagonal=Side(border_style="thin"),
+                                                diagonalDown=True)
+            wsheet.cell(1, 1).font = Font(vertAlign="subscript")
+            wsheet.cell(1, 1).value = " " * 24 + "Algorithm\nRound No."
             for row in wsheet.iter_cols(min_row=3, min_col=1, max_row=self.__number_of_rounds+2):
                 i = 1
                 for cell in row:
