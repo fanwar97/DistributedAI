@@ -5,8 +5,10 @@ import argparse
 import glob
 import math
 import os
+import pathlib
 import random
 import subprocess
+
 
 class GenerateDGA:
     """Class to generate domains"""
@@ -73,7 +75,7 @@ class GenerateDGA:
                 print(file)
             else:
                 continue
-            self.__exec_dict_based(self.__convert_path(file))
+            self.__exec_dict_based(pathlib.PurePath(file).as_posix())
         self.__write_attack_to_file(self.__domain_list, self.__output_dir +
                                                         "attack_dict_based.txt")
         self.__domain_list.clear()
@@ -94,7 +96,7 @@ class GenerateDGA:
                 print(file)
             else:
                 continue
-            self.__exec_char_based(self.__convert_path(file))
+            self.__exec_char_based(pathlib.PurePath(file).as_posix())
         self.__write_attack_to_file(self.__domain_list, self.__output_dir +
                                                         "attack_char_based.txt")
         self.__domain_list.clear()
@@ -118,9 +120,9 @@ class GenerateDGA:
                 if algo_name in file:
                     print(file)
                     if not is_dict_based:
-                        self.__exec_char_based(self.__convert_path(file))
+                        self.__exec_char_based(pathlib.PurePath(file).as_posix())
                     else:
-                        self.__exec_dict_based(self.__convert_path(file))
+                        self.__exec_dict_based(pathlib.PurePath(file).as_posix())
             if self.__multiple_list:
                 self.__process_multiple()
                 self.__multiple_list.clear()
@@ -267,13 +269,6 @@ class GenerateDGA:
             if elem in file:
                 return True, elem
         return False, None
-
-    @staticmethod
-    def __convert_path(path):
-        """Process path if the running OS is Windows"""
-        if os.name == "nt":
-            return path.replace("\\", "/")
-        return path
 
 if __name__=="__main__":
     parser = argparse.ArgumentParser(description="Generate DGAs randomly")
