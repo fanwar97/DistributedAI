@@ -87,12 +87,8 @@ class LogToExcel:
                                     + str(self.__samples_per_round) + "_"
                                     + str(self.__number_of_rounds) + ".txt",
                                     encoding="utf-8") as file:
-                line = file.readline()
-                while line:
-                    if "Detection rate" in line:
-                        line = re.sub("[^\\d.]", "", line)
-                        self.__rate_list.append(line)
-                    line = file.readline()
+                content = file.read()
+            self.__rate_list.extend(re.findall(r"\d+\.\d+", content))
 
     @staticmethod
     def __convert_path(path):
