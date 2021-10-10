@@ -4,11 +4,13 @@ Module to parse training log to a Microsoft Excel file
 import argparse
 import glob
 import os
+import pathlib
 import re
 
 from openpyxl import Workbook
 from openpyxl.styles import Alignment
 from openpyxl.utils import get_column_letter
+
 
 # pylint: disable=R0903
 class LogToExcel:
@@ -74,7 +76,7 @@ class LogToExcel:
         """Parse training logs filename to corresponding params."""
         logs = list(glob.glob("logs/training log*.txt"))
         for elem in logs:
-            temp = self.__convert_path(elem).replace("logs/training log_", "").replace(".txt", "")
+            temp = pathlib.Path(elem).stem.replace("training log_", "")
             params_list = temp.split("_")
             if self.__samples_per_round == int(params_list[1]) \
                         and self.__number_of_rounds == int(params_list[2]):
@@ -89,13 +91,6 @@ class LogToExcel:
                                     encoding="utf-8") as file:
                 content = file.read()
             self.__rate_list.extend(re.findall(r"\d+\.\d+", content))
-
-    @staticmethod
-    def __convert_path(path):
-        """Process path if the running OS is Windows"""
-        if os.name == "nt":
-            return path.replace("\\", "/")
-        return path
 
 if __name__=="__main__":
     parser = argparse.ArgumentParser(description="Parse training log files to .xlsx")
