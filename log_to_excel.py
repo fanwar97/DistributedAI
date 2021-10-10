@@ -3,7 +3,6 @@ Module to parse training log to a Microsoft Excel file
 """
 import argparse
 import glob
-import os
 import pathlib
 import re
 
