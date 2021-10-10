@@ -38,7 +38,7 @@ class LogToExcel:
         else:
             wbook = Workbook()
             wsheet = wbook.active
-            for row in wsheet.iter_rows(min_row=1, min_col=3, max_col=self.__number_of_rounds+2):
+            for row in wsheet.iter_cols(min_row=3, min_col=1, max_row=self.__number_of_rounds+2):
                 i = 1
                 for cell in row:
                     cell.alignment = Alignment(horizontal="center", vertical="center")
@@ -46,28 +46,28 @@ class LogToExcel:
                     i += 1
 
             for i, elem in enumerate(self.__algo_list):
-                wsheet.merge_cells(start_row=2*(i+1), start_column=1,
-                                    end_row=2*(i+1)+1, end_column=1)
-                wsheet.cell(2*(i+1), 1).alignment = Alignment(horizontal="center",
+                wsheet.merge_cells(start_row=1, start_column=2*(i+1),
+                                    end_row=1, end_column=2*(i+1)+1)
+                wsheet.cell(1, 2*(i+1)).alignment = Alignment(horizontal="center",
                                                                     vertical="center")
-                wsheet.cell(2*(i+1), 1).value = elem
-                wsheet.cell(2*(i+1), 2).alignment = Alignment(horizontal="center",
+                wsheet.cell(1, 2*(i+1)).value = elem
+                wsheet.cell(2, 2*(i+1)).alignment = Alignment(horizontal="center",
                                                                     vertical="center")
-                wsheet.cell(2*(i+1), 2).value = "before"
-                wsheet.cell(2*(i+1)+1, 2).alignment = Alignment(horizontal="center",
+                wsheet.cell(2, 2*(i+1)).value = "before"
+                wsheet.cell(2, 2*(i+1)+1).alignment = Alignment(horizontal="center",
                                                                     vertical="center")
-                wsheet.cell(2*(i+1)+1, 2).value = "after"
+                wsheet.cell(2, 2*(i+1)+1).value = "after"
                 j = 0
-                for col in wsheet.iter_cols(min_row=2*(i+1), min_col=3,
-                                        max_row=2*(i+1)+1, max_col=self.__number_of_rounds+2):
-                    for cell in col:
+                for row in wsheet.iter_rows(min_row=3, min_col=2*(i+1),
+                                        max_row=self.__number_of_rounds+2, max_col=2*(i+1)+1):
+                    for cell in row:
                         cell.alignment = Alignment(horizontal="center", vertical="center")
                         cell.value = float(self.__rate_list[i*self.__number_of_rounds*2+j])
                         cell.number_format = "0.0000"
                         j += 1
 
-            for col in range(wsheet.min_column, wsheet.max_column + 1):
-                wsheet.column_dimensions[get_column_letter(col)].bestFit = True
+            for row in range(wsheet.min_column, wsheet.max_column + 1):
+                wsheet.column_dimensions[get_column_letter(row)].bestFit = True
 
             wbook.save(filename)
 
