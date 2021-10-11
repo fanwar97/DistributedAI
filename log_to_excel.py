@@ -45,12 +45,10 @@ class LogToExcel:
                                                 diagonalDown=True)
             wsheet.cell(1, 1).font = Font(vertAlign="subscript")
             wsheet.cell(1, 1).value = " " * 24 + "Algorithm\nRound No."
-            for row in wsheet.iter_cols(min_row=3, min_col=1, max_row=self.__number_of_rounds+2):
-                i = 1
-                for cell in row:
+            for col in wsheet.iter_cols(min_row=3, min_col=1, max_row=self.__number_of_rounds+2):
+                for i, cell in enumerate(col):
                     cell.alignment = Alignment(horizontal="center", vertical="center")
-                    cell.value = i
-                    i += 1
+                    cell.value = i+1
 
             for i, elem in enumerate(self.__algo_list):
                 wsheet.merge_cells(start_row=1, start_column=2*(i+1),
@@ -64,17 +62,15 @@ class LogToExcel:
                 wsheet.cell(2, 2*(i+1)+1).alignment = Alignment(horizontal="center",
                                                                     vertical="center")
                 wsheet.cell(2, 2*(i+1)+1).value = "after"
-                j = 0
-                for row in wsheet.iter_rows(min_row=3, min_col=2*(i+1),
-                                        max_row=self.__number_of_rounds+2, max_col=2*(i+1)+1):
-                    for cell in row:
+                for j, row in enumerate(wsheet.iter_rows(min_row=3, min_col=2*(i+1),
+                                        max_row=self.__number_of_rounds+2, max_col=2*(i+1)+1)):
+                    for k, cell in enumerate(row):
                         cell.alignment = Alignment(horizontal="center", vertical="center")
-                        cell.value = float(self.__rate_list[i*self.__number_of_rounds*2+j])
+                        cell.value = float(self.__rate_list[2*(i*self.__number_of_rounds+j)+k])
                         cell.number_format = "0.0000"
-                        j += 1
 
-            for row in range(wsheet.min_column, wsheet.max_column + 1):
-                wsheet.column_dimensions[get_column_letter(row)].bestFit = True
+            for col in range(wsheet.min_column, wsheet.max_column + 1):
+                wsheet.column_dimensions[get_column_letter(col)].bestFit = True
 
             wbook.save(filename)
 
