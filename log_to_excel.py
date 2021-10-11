@@ -28,7 +28,7 @@ class LogToExcel:
         self.__number_of_rounds = number_of_rounds
 
     def to_excel(self):
-        """Write to new Microsoft Excel sheet."""
+        """Write to a new Microsoft Excel sheet."""
         self.__parse_training_log()
         filename = "summary_" + str(self.__samples_per_round) + "_" \
                                 + str(self.__number_of_rounds) + ".xlsx"
@@ -100,5 +100,5 @@ if __name__=="__main__":
     parser.add_argument("number_of_rounds", type=int, help="number of rounds")
     args = parser.parse_args()
 
-    to_log = LogToExcel(args.samples_per_round, args.number_of_rounds)
-    to_log.to_excel()
+    obj = LogToExcel(args.samples_per_round, args.number_of_rounds)
+    obj.to_excel()
