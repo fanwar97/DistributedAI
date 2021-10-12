@@ -42,8 +42,7 @@ class LogToExcel:
             wsheet.cell(1, 1).alignment = Alignment(wrapText=True)
             wsheet.cell(1, 1).border = Border(diagonal=Side(border_style="thin"),
                                                 diagonalDown=True)
-            wsheet.cell(1, 1).font = Font(vertAlign="subscript")
-            wsheet.cell(1, 1, " " * 24 + "Algorithm\nRound No.")
+            wsheet.cell(1, 1, " " * 24 + "Algorithm\nRound No.").font = Font(vertAlign="subscript")
             for col in wsheet.iter_cols(min_row=3, min_col=1, max_row=self.__number_of_rounds+2):
                 for i, cell in enumerate(col):
                     cell.alignment = Alignment(horizontal="center", vertical="center")
@@ -52,15 +51,12 @@ class LogToExcel:
             for i, elem in enumerate(self.__algo_list):
                 wsheet.merge_cells(start_row=1, start_column=2*(i+1),
                                     end_row=1, end_column=2*(i+1)+1)
-                wsheet.cell(1, 2*(i+1)).alignment = Alignment(horizontal="center",
+                wsheet.cell(1, 2*(i+1), elem).alignment = Alignment(horizontal="center",
                                                                     vertical="center")
-                wsheet.cell(1, 2*(i+1), elem)
-                wsheet.cell(2, 2*(i+1)).alignment = Alignment(horizontal="center",
-                                                                    vertical="center")
-                wsheet.cell(2, 2*(i+1), "before")
-                wsheet.cell(2, 2*(i+1)+1).alignment = Alignment(horizontal="center",
-                                                                    vertical="center")
-                wsheet.cell(2, 2*(i+1)+1, "after")
+                wsheet.cell(2, 2*(i+1), "before").alignment = Alignment(horizontal="center",
+                                                                        vertical="center")
+                wsheet.cell(2, 2*(i+1)+1, "after").alignment = Alignment(horizontal="center",
+                                                                        vertical="center")
                 for j, row in enumerate(wsheet.iter_rows(min_row=3, min_col=2*(i+1),
                                         max_row=self.__number_of_rounds+2, max_col=2*(i+1)+1)):
                     for k, cell in enumerate(row):
