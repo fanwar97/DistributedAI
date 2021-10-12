@@ -17,8 +17,7 @@ class LogToExcel:
     Class that contains necessary function to do the parsing.
     In order for this to work, one must name the training logs with syntax as follow:\n
         training log_[algorithm name]_[samples per round]_[number_of_rounds].txt\n
-    And also put all the log files in the same directory as the running script or else
-    it won't work.
+    And also put all the log files in the "logs" folder or else it won't work.
     """
 
     def __init__(self, samples_per_round, number_of_rounds):
