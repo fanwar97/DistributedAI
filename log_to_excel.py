@@ -39,10 +39,10 @@ class LogToExcel:
             wsheet = wbook.active
             wsheet.merge_cells(start_row=1, start_column=1,
                                     end_row=2, end_column=1)
-            wsheet.cell(1, 1).alignment = Alignment(wrapText=True)
-            wsheet.cell(1, 1).border = Border(diagonal=Side(border_style="thin"),
-                                                diagonalDown=True)
-            wsheet.cell(1, 1, " " * 24 + "Algorithm\nRound No.").font = Font(vertAlign="subscript")
+            header_cell = wsheet.cell(1, 1, " " * 24 + "Algorithm\nRound No.")
+            header_cell.alignment = Alignment(wrapText=True)
+            header_cell.border = Border(diagonal=Side(border_style="thin"), diagonalDown=True)
+            header_cell.font = Font(vertAlign="subscript")
             for col in wsheet.iter_cols(min_row=3, min_col=1, max_row=self.__number_of_rounds+2):
                 for i, cell in enumerate(col):
                     cell.alignment = Alignment(horizontal="center", vertical="center")
