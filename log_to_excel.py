@@ -43,7 +43,7 @@ class LogToExcel:
             wsheet.cell(1, 1).border = Border(diagonal=Side(border_style="thin"),
                                                 diagonalDown=True)
             wsheet.cell(1, 1).font = Font(vertAlign="subscript")
-            wsheet.cell(1, 1).value = " " * 24 + "Algorithm\nRound No."
+            wsheet.cell(1, 1, " " * 24 + "Algorithm\nRound No.")
             for col in wsheet.iter_cols(min_row=3, min_col=1, max_row=self.__number_of_rounds+2):
                 for i, cell in enumerate(col):
                     cell.alignment = Alignment(horizontal="center", vertical="center")
@@ -54,13 +54,13 @@ class LogToExcel:
                                     end_row=1, end_column=2*(i+1)+1)
                 wsheet.cell(1, 2*(i+1)).alignment = Alignment(horizontal="center",
                                                                     vertical="center")
-                wsheet.cell(1, 2*(i+1)).value = elem
+                wsheet.cell(1, 2*(i+1), elem)
                 wsheet.cell(2, 2*(i+1)).alignment = Alignment(horizontal="center",
                                                                     vertical="center")
-                wsheet.cell(2, 2*(i+1)).value = "before"
+                wsheet.cell(2, 2*(i+1), "before")
                 wsheet.cell(2, 2*(i+1)+1).alignment = Alignment(horizontal="center",
                                                                     vertical="center")
-                wsheet.cell(2, 2*(i+1)+1).value = "after"
+                wsheet.cell(2, 2*(i+1)+1, "after")
                 for j, row in enumerate(wsheet.iter_rows(min_row=3, min_col=2*(i+1),
                                         max_row=self.__number_of_rounds+2, max_col=2*(i+1)+1)):
                     for k, cell in enumerate(row):
