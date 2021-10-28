@@ -17,7 +17,7 @@ from glob_inc.print_log import print_log
 from glob_inc.utils import *
 from message import *
 from model import *
-from random_stuff_for_practice.handletrace import test_with_dic_based_atk
+from random_stuff_for_practice.handletrace import test_with_data
 
 # validChars = {chr(i+45):i for i in range(0,78)}
 
@@ -51,9 +51,13 @@ def handle_packet(queue, mutex):
 
 def update_current_model(avg_weight, cur_model_info, round_counter):
     current_model = cur_model_info[1]
-    test_with_dic_based_atk(current_model, round_counter, 1)
+    test_with_data(current_model, avg_weight, round_counter, "attacks/attack_char_based.txt", 1)
+    test_with_data(current_model, avg_weight, round_counter, "attacks/attack_dict_based.txt", 1)
+    test_with_data(current_model, avg_weight, round_counter, "random_stuff_for_practice/benign.txt", 0)
+    # test_with_dic_based_atk(current_model, round_counter, 1)
+    # current_model.set_weights(avg_weight)
+    # test_with_dic_based_atk(current_model, round_counter, 0)
     current_model.set_weights(avg_weight)
-    test_with_dic_based_atk(current_model, round_counter, 0)
     cur_model_info[1] = current_model
 
 def train_current_model(cur_model_info, train_file):
