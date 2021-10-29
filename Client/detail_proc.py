@@ -51,9 +51,9 @@ def handle_packet(queue, mutex):
 
 def update_current_model(avg_weight, cur_model_info, round_counter):
     current_model = cur_model_info[1]
-    test_with_data(current_model, avg_weight, round_counter, "attacks/attack_char_based.txt", 1)
+    # test_with_data(current_model, avg_weight, round_counter, "attacks/attack_char_based.txt", 1)
     test_with_data(current_model, avg_weight, round_counter, "attacks/attack_dict_based.txt", 1)
-    test_with_data(current_model, avg_weight, round_counter, "random_stuff_for_practice/benign.txt", 0)
+    # test_with_data(current_model, avg_weight, round_counter, "random_stuff_for_practice/benign.txt", 0)
     # test_with_dic_based_atk(current_model, round_counter, 1)
     # current_model.set_weights(avg_weight)
     # test_with_dic_based_atk(current_model, round_counter, 0)

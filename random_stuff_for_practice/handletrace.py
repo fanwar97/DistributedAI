@@ -14,7 +14,7 @@ import os
 validChars = {chr(i+45): i for i in range(0, 78)}
 maxlen = 127
 
-def do_evaluate(y, probs, round, before, filename, label):
+def do_evaluate(y, probs, round, before, filename, label, end):
     project_dir = os.getcwd() + "/../"
     f = open(project_dir + "Client/log/training_log", "a")
     if before == 1:
@@ -56,7 +56,7 @@ def do_evaluate(y, probs, round, before, filename, label):
     # f.write(f"Precision: {precision}")
     # f.write(f"Recal: {recall}")
     # f.write(f"F1-score: {f1score}")
-    if before == 0 and label == 0:
+    if before == 0 and end == 1:
         f.write("-------------------------END OF ROUND " + str(round) + "--------------------------------\n")
 
 def test_with_dic_based_atk(model, round, before):
@@ -73,9 +73,9 @@ def test_with_dic_based_atk(model, round, before):
     probs = model.predict(X)
     do_evaluate(y, probs, round, before)
 
-def test_with_data(model, avg_weight, round, file, label):
+def test_with_data(model, avg_weight, round, file, label, end):
     file_to_test = "/../" + file
-    test_domain = read_csv(os.getcwd() + file_to_test, names=['domain'], nrows= 200000)
+    test_domain = read_csv(os.getcwd() + file_to_test, names=['domain'], nrows= 20000)
     test_domain['tld'] = [tldextract.extract(d).domain for d in test_domain['domain']]
     test_domain = test_domain[~test_domain['tld'].str.contains('\`|-\.')]
     test_domain = test_domain.drop_duplicates()
@@ -86,9 +86,9 @@ def test_with_data(model, avg_weight, round, file, label):
     X = pad_sequences(X, maxlen=maxlen)
 
     probs = model.predict(X)
-    do_evaluate(y, probs, round, 1, file, label)
+    do_evaluate(y, probs, round, 1, file, label, 0)
 
     model.set_weights(avg_weight)
 
     probs2 = model.predict(X)
-    do_evaluate(y, probs2, round, 0, file, label)
+    do_evaluate(y, probs2, round, 0, file, label, end)
