@@ -49,7 +49,6 @@ def do_train_model(current_model, train_file):
     # print(f"Precision: {precision}")
     # print(f"Recal: {recall}")
     # print(f"F1-score: {f1score}")
-    print(probs)
     num_sample = len(y)
     count = 0
     for i in range(0, num_sample):
