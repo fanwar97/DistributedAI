@@ -34,7 +34,7 @@ log_loss_before = np.reshape(log_loss[::2],(-1,n_round))
 log_loss_after = np.reshape(log_loss[1::2],(-1,n_round))
 
 data = []
-for i in range (0,2*count):
+for i in range (0,4*count):
     if(i%4 == 0):
         a = np.append(dga_names[i],detection_rate_before[int(i/4)])
         data.append(a)
