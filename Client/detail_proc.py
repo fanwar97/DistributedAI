@@ -51,13 +51,17 @@ def handle_packet(queue, mutex):
 
 def update_current_model(avg_weight, cur_model_info, round_counter):
     current_model = cur_model_info[1]
-    # test_with_data(current_model, avg_weight, round_counter, "attacks/attack_char_based.txt", 1)
-    test_with_data(current_model, avg_weight, round_counter, "attacks/attack_dict_based.txt", 1)
+    # test_with_data(current_model, avg_weight, round_counter, "attacks/attack_char_based.txt", 1, 1)
+    # test_with_data(current_model, avg_weight, round_counter, "attacks/attack_dict_based.txt", 1, 1)
     # test_with_data(current_model, avg_weight, round_counter, "random_stuff_for_practice/benign.txt", 0)
     # test_with_dic_based_atk(current_model, round_counter, 1)
     # current_model.set_weights(avg_weight)
     # test_with_dic_based_atk(current_model, round_counter, 0)
+    save_file = "model_before_avg_round" + str(round_counter)
+    current_model.save("save_models/" + save_file)
     current_model.set_weights(avg_weight)
+    save_file = "model_after_avg_round" + str(round_counter)
+    current_model.save("save_models/" + save_file)
     cur_model_info[1] = current_model
 
 def train_current_model(cur_model_info, train_file):
@@ -65,7 +69,7 @@ def train_current_model(cur_model_info, train_file):
         current_model = tf.keras.models.load_model(os.getcwd() + "/client_model/simple_LSTM_model")  
     else:     
         current_model = cur_model_info[1]
-    
+    # 
     ret, model_after_train = do_train_model(current_model, train_file)
     cur_model_info[1] = model_after_train
     return ret

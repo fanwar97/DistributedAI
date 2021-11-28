@@ -75,7 +75,7 @@ def test_with_dic_based_atk(model, round, before):
 
 def test_with_data(model, avg_weight, round, file, label, end):
     file_to_test = "/../" + file
-    test_domain = read_csv(os.getcwd() + file_to_test, names=['domain'], nrows= 20000)
+    test_domain = read_csv(os.getcwd() + file_to_test, names=['domain'], nrows= 200000)
     test_domain['tld'] = [tldextract.extract(d).domain for d in test_domain['domain']]
     test_domain = test_domain[~test_domain['tld'].str.contains('\`|-\.')]
     test_domain = test_domain.drop_duplicates()

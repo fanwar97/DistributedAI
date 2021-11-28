@@ -1,0 +1,8 @@
+---------------------Round1
+Detection rate for save_models/model_before_avg_round1: 0.5007988449922238
+Cross-Entropy/Log loss for save_models/model_before_avg_round1: 6.452214096753091
+-------------------------END OF ROUND 1--------------------------------
+---------------------Round2
+Detection rate for save_models/model_before_avg_round2: 0.5542657260996725
+Cross-Entropy/Log loss for save_models/model_before_avg_round2: 5.39442245757242
+-------------------------END OF ROUND 2--------------------------------
