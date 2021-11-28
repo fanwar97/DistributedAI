@@ -40,7 +40,7 @@ def do_evaluate(y, probs, round, filename, label):
     f.close()
 
 if __name__ == "__main__":
-    test_file = os.getcwd() + "/../attacks/attack_char_based.txt";
+    test_file = os.getcwd() + "/../attacks/attack_char_based.txt"
     print(f"testing with {test_file}")
     test_domain = read_csv(test_file, names=['domain'])
     test_domain['tld'] = [tldextract.extract(d).domain for d in test_domain['domain']]
