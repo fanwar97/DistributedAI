@@ -77,6 +77,9 @@ class GenerateDGA:
         """
         Get random char based domains and divide them into files.
         The algorithms between files are mutually exclusive to each other.
+        Please be aware that some scripts in this algorithm are hardcoded
+        and may not generate enough samples from an arbitrary number.
+        Number of samples in the final .txt file can be less than expected.
         """
         self.__gen_attack_char_based()
         algo_per_file = math.floor(len(self.__domain_list) / number_of_files)
