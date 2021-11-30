@@ -1,8 +1,8 @@
 # Note
-- Algorithms that cannot generate 5000 samples:
-    - bazarbackdoor\dga.py
+- Algorithms that are hardcoded and may not generate enough samples from an arbitrary number:
+    - bazarbackdoor
     - chinad
-    - locky\dgav2.py
+    - locky
     - padcrypt
     - pushdo
     - qsnatch
