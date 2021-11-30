@@ -53,7 +53,5 @@ if __name__=="__main__":
     args = parser.parse_args()
     domain = args.domain
     for i in range(args.nr):
-        print(domain)
         domain = get_next_domain(domain)
-
-
+        print(domain)
