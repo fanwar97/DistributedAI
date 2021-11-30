@@ -21,10 +21,10 @@ class GenerateDGA:
                     "vawtrak"]
 
     ###
-    # Number of samples: Final number of generated domains by each algorithm
-    #                       to be output on to .txt
-    # Gen num: Initial number of domains to be generated before being picked randomly
-    #             again for the final output
+    # Number of samples:    Final number of generated domains by each algorithm
+    #                       to be written to a .txt file
+    # Gen num:  Initial number of domains to be generated before being sampled
+    #           again for the final output
     # NOTE: Gen num > Number of samples
     ###
     def __init__(self, python_path, number_of_samples, gen_num = None, output_dir = None):
