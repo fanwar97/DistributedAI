@@ -76,33 +76,45 @@ class GenerateDGA:
             else:
                 continue
             self.__exec_dict_based(pathlib.PurePath(file).as_posix())
-        self.__write_attack_to_file(self.__domain_list, self.__output_dir +
-                                                        "attack_dict_based.txt")
+        domain_list_expanded = self.__flatten_list(self.__domain_list)
+        self.__write_attack_to_file(domain_list_expanded, self.__output_dir + "attack_dict_based_" +
+                                    str(self.__number_of_samples) + "_each.txt")
         self.__domain_list.clear()
 
     def get_attack_char_based(self):
         """Get random char based domains"""
-        print("Generating char based domains...")
-        current_multiple = None
-        for file in self.__files:
-            which_mul = self.__check_name_list_in_file(self.__multiple, file)[1]
-            if current_multiple != which_mul:
-                if self.__multiple_list:
-                    self.__process_multiple()
-                    self.__multiple_list.clear()
-                current_multiple = which_mul
-            is_dict_based = self.__check_name_list_in_file(self.__dict_based, file)[0]
-            if not is_dict_based:
-                print(file)
+        self.__gen_attack_char_based()
+        domain_list_expanded = self.__flatten_list(self.__domain_list)
+        self.__write_attack_to_file(domain_list_expanded, self.__output_dir + "attack_char_based_" +
+                                    str(self.__number_of_samples) + "_each.txt")
+        self.__domain_list.clear()
+
+    def get_attack_char_based_mutually_exclusive(self, number_of_files):
+        """
+        Get random char based domains and divide them into files.
+        The algorithms between files are mutually exclusive to each other.
+        """
+        self.__gen_attack_char_based()
+        algo_per_file = math.floor(len(self.__domain_list) / number_of_files)
+        remain = len(self.__domain_list) % number_of_files
+        algo_per_file_list = []
+        for index in range(number_of_files):
+            if index < remain:
+                algo_per_file_list.append(algo_per_file)
             else:
-                continue
-            self.__exec_char_based(pathlib.PurePath(file).as_posix())
-        self.__write_attack_to_file(self.__domain_list, self.__output_dir +
-                                                        "attack_char_based.txt")
+                algo_per_file_list.append(algo_per_file+1)
+        random.shuffle(algo_per_file_list)
+        for index in range(number_of_files):
+            temp_list = self.__flatten_list(
+                            self.__domain_list.pop(random.randrange(len(self.__domain_list)))
+                            for _ in range(algo_per_file_list[index]))
+            self.__write_attack_to_file(temp_list, self.__output_dir +
+                                        "attack_char_based_mutually_exclusive" + "_" +
+                                        str(index+1).zfill(2) + ".txt")
         self.__domain_list.clear()
 
     def get_attack_by_algo(self, algo_name, number_of_files):
-        """Generate attacks by algorithm name"""
+        """Get attack domains by algorithm name"""
         samples_per_file = math.ceil(self.__number_of_samples / number_of_files)
         algo_list = os.listdir("generators")
         is_exist = self.__check_name_in_list(algo_name, algo_list)
@@ -112,9 +124,9 @@ class GenerateDGA:
             print("Generating " + algo_name + " domains...")
             is_dict_based = self.__check_name_in_list(algo_name, self.__dict_based)
             is_limited = self.__check_name_in_list(algo_name, self.__limited)
-            if is_limited and not is_dict_based:
+            if is_limited:
                 print("Please be aware that some scripts in this algorithm are hardcoded "
-                        "and cannot generate any specified number of samples.\n"
+                        "and may not generate enough samples from an arbitrary number.\n"
                         "Number of generated files can be less than expected.")
             for file in self.__files:
                 if algo_name in file:
@@ -126,10 +138,11 @@ class GenerateDGA:
             if self.__multiple_list:
                 self.__process_multiple()
                 self.__multiple_list.clear()
-            if len(self.__domain_list) < self.__number_of_samples:
-                number_of_files = math.ceil(len(self.__domain_list) / samples_per_file)
+            if len(self.__domain_list[0]) < self.__number_of_samples:
+                number_of_files = math.ceil(len(self.__domain_list[0]) / samples_per_file)
             for index in range(number_of_files):
-                temp_list = self.__domain_list[index*samples_per_file:(index+1)*samples_per_file]
+                temp_list = self.__domain_list[0][index*samples_per_file:
+                                                    (index+1)*samples_per_file]
                 self.__write_attack_to_file(temp_list, self.__output_dir + algo_name + "_" +
                                             str(samples_per_file) + "_" +
                                             str(index+1).zfill(2) + ".txt")
@@ -157,7 +170,7 @@ class GenerateDGA:
         if is_multiple:
             self.__multiple_list.extend(temp_domain_list)
         else:
-            self.__domain_list.extend(temp_domain_list)
+            self.__domain_list.append(temp_domain_list)
 
     def __exec_dict_based(self, file):
         """
@@ -175,6 +188,24 @@ class GenerateDGA:
         with open(output_name, "w", encoding="utf-8") as file:
             for element in domain_list:
                 file.write(element + "\n")
+
+    def __gen_attack_char_based(self):
+        """Generate random char based domains"""
+        print("Generating char based domains...")
+        current_multiple = None
+        for file in self.__files:
+            which_mul = self.__check_name_list_in_file(self.__multiple, file)[1]
+            if current_multiple != which_mul:
+                if self.__multiple_list:
+                    self.__process_multiple()
+                    self.__multiple_list.clear()
+                current_multiple = which_mul
+            is_dict_based = self.__check_name_list_in_file(self.__dict_based, file)[0]
+            if not is_dict_based:
+                print(file)
+            else:
+                continue
+            self.__exec_char_based(pathlib.PurePath(file).as_posix())
 
     def __exec_char_based(self, file):
         """
@@ -226,7 +257,7 @@ class GenerateDGA:
         with open("benign.txt", "r", encoding="utf-8") as temp_file:
             while random.randrange(self.__gen_num):
                 temp_file.readline()
-            seed_domain = temp_file.readline()
+            seed_domain = temp_file.readline().rstrip("\n")
         self.__run_algorithm([seed_domain, "-n", str(self.__gen_num)], file)
 
     def __case_1(self, file):
@@ -250,9 +281,16 @@ class GenerateDGA:
     def __process_multiple(self):
         """Process algorithm that have multiple scripts"""
         if len(self.__multiple_list) <= self.__number_of_samples:
-            self.__domain_list.extend(self.__multiple_list)
+            self.__domain_list.append(self.__multiple_list)
         else:
-            self.__domain_list.extend(random.sample(self.__multiple_list, self.__number_of_samples))
+            self.__domain_list.append(random.sample(self.__multiple_list, self.__number_of_samples))
+
+    @staticmethod
+    def __flatten_list(nested_list):
+        """Flatten out a 2D nested list"""
+        temp = []
+        list(map(temp.extend, nested_list))
+        return temp
 
     @staticmethod
     def __check_name_in_list(name, alist):
@@ -284,18 +322,24 @@ if __name__=="__main__":
                         help="output directory of the generated domains, "
                                 "default to Client/train_file/",
                         default="Client/train_file/")
-    by_algo = parser.add_argument_group("by algorithm")
-    by_algo.add_argument("--algo",
-                        help="generate domains by algorithm")
-    by_algo.add_argument("--file_num",
-                        help="number of files to be divided into",
-                        type=int)
+    extended = parser.add_argument_group("extended functions")
+    extended.add_argument("--algo",
+                            help="algorithm to generate attack domains")
+    extended.add_argument("--file_num",
+                            help="number of files to be divided into. "
+                                    "This argument usually goes with --algo. "
+                                    "If it is specified alone, the script will generate char-based "
+                                    "attack domains and divide them into files, the algorithms in "
+                                    "all of which will be mutually exclusive to each other",
+                            type=int)
     args = parser.parse_args()
 
     gen = GenerateDGA(args.py_path, args.samples, args.init_num, args.out_dir)
     if args.algo and args.file_num:
         gen.get_attack_by_algo(args.algo, args.file_num)
-    elif args.algo or args.file_num:
+    elif args.file_num:
+        gen.get_attack_char_based_mutually_exclusive(args.file_num)
+    elif args.algo:
         parser.error("Both --algo and --file_num flags must be specified together.")
     else:
         for i in range(2):
