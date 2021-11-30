@@ -50,22 +50,6 @@ class GenerateDGA:
         if not self.__gen_num or self.__gen_num < self.__number_of_samples:
             self.__gen_num = self.__number_of_samples
 
-    def get_benign(self):
-        """Get random benign domains"""
-        print("Generating benign domains...")
-        with open(self.__org_path + "benign.txt", "r", encoding="utf-8") as file1:
-            counter = 0
-            with open(self.__output_dir + "benign_" + str(self.__number_of_samples) + ".txt", "w",
-                        encoding="utf-8") as file2:
-                for aline in file1:
-                    if random.randrange(round(pow(10, 5) / self.__number_of_samples)):
-                        continue
-                    file2.write(aline)
-                    counter += 1
-                    if counter == self.__number_of_samples:
-                        return True
-        return False
-
     def get_attack_dict_based(self):
         """Get random dict based domains."""
         print("Generating dict based domains...")
