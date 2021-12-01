@@ -200,34 +200,34 @@ class GenerateDGA:
         This function evaluates algorithm name and execute with corresponding params.
         """
         char_based_case = {
-            "banjori": lambda: self.__case_4(file),
-            "corebot": lambda: self.__case_4(file),
-            "dircrypt": lambda: self.__case_3(file),
-            "dnschanger": lambda: self.__case_3(file),
-            "fobber": lambda: self.__case_2(file),
-            "fosniw": lambda: self.__case_4(file),
-            "kraken": lambda: self.__case_4(file),
-            "locky/dgav3.py": lambda: self.__case_4(file),
-            "murofet": lambda: self.__case_4(file),
-            "mydoom": lambda: self.__case_4(file),
-            "necurs": lambda: self.__case_4(file),
-            "newgoz": lambda: self.__case_4(file),
-            "nymaim": lambda: self.__case_4(file),
-            "pitou": lambda: self.__case_4(file),
-            "pizd": lambda: self.__case_4(file),
-            "proslikefan": lambda: self.__case_4(file),
-            "pykspa": lambda: self.__case_4(file),
-            "qadars": lambda: self.__case_4(file),
-            "qakbot": lambda: self.__case_4(file),
-            "ramdo": lambda: self.__case_4(file),
-            "ramnit": lambda: self.__case_3(file),
-            "ranbyus": lambda: self.__case_1(file),
-            "reconyc": lambda: self.__case_4(file),
-            "shiotob": lambda: self.__case_0(file),
-            "simda": lambda: self.__case_4(file),
-            "symmi": lambda: self.__case_4(file),
-            "vawtrak": lambda: self.__case_4(file),
-            "zloader": lambda: self.__case_4(file),
+            "banjori": lambda: self.__default_case(file),
+            "corebot": lambda: self.__default_case(file),
+            "dircrypt": lambda: self.__case_4(file),
+            "dnschanger": lambda: self.__case_4(file),
+            "fobber": lambda: self.__case_3(file),
+            "fosniw": lambda: self.__default_case(file),
+            "kraken": lambda: self.__default_case(file),
+            "locky/dgav3.py": lambda: self.__default_case(file),
+            "murofet": lambda: self.__default_case(file),
+            "mydoom": lambda: self.__default_case(file),
+            "necurs": lambda: self.__default_case(file),
+            "newgoz": lambda: self.__default_case(file),
+            "nymaim": lambda: self.__default_case(file),
+            "pitou": lambda: self.__default_case(file),
+            "pizd": lambda: self.__default_case(file),
+            "proslikefan": lambda: self.__default_case(file),
+            "pykspa": lambda: self.__default_case(file),
+            "qadars": lambda: self.__default_case(file),
+            "qakbot": lambda: self.__default_case(file),
+            "ramdo": lambda: self.__default_case(file),
+            "ramnit": lambda: self.__case_4(file),
+            "ranbyus": lambda: self.__case_2(file),
+            "reconyc": lambda: self.__default_case(file),
+            "shiotob": lambda: self.__case_1(file),
+            "simda": lambda: self.__default_case(file),
+            "symmi": lambda: self.__default_case(file),
+            "vawtrak": lambda: self.__default_case(file),
+            "zloader": lambda: self.__default_case(file),
         }
         is_char_based_with_params = False
         for item in char_based_case.items():
@@ -238,7 +238,7 @@ class GenerateDGA:
         if not is_char_based_with_params:
             self.__run_algorithm([], file)
 
-    def __case_0(self, file):
+    def __case_1(self, file):
         """For shiotob"""
         os.chdir(self.__org_path)
         with open("benign.txt", "r", encoding="utf-8") as temp_file:
@@ -247,20 +247,20 @@ class GenerateDGA:
             seed_domain = temp_file.readline().rstrip("\n")
         self.__run_algorithm([seed_domain, "-n", str(self.__gen_num)], file)
 
-    def __case_1(self, file):
+    def __case_2(self, file):
         """For ranbyus"""
         self.__run_algorithm([], file)
 
-    def __case_2(self, file):
+    def __case_3(self, file):
         """For fobber"""
         self.__run_algorithm([str(random.randint(1,2)), "-n", str(self.__gen_num)], file)
 
-    def __case_3(self, file):
+    def __case_4(self, file):
         """For dircrypt, dnstracker and ramnit"""
         self.__run_algorithm([str(random.randint(0, self.__gen_num)), "-n",
                                 str(self.__gen_num)], file)
 
-    def __case_4(self, file):
+    def __default_case(self, file):
         """Most of the cases"""
         self.__run_algorithm(["-n", str(self.__gen_num)], file)
 
