@@ -15,7 +15,7 @@ class GenerateDGA:
     __org_path = os.getcwd() + "/"
     __files = list(glob.glob("generators" + "/**/dga*.py", recursive=True))
     __dict_based = ["gozi", "nymaim2", "pizd", "suppobox"]
-    __limited = ["bazarbackdoor", "chinad", "locky", "padcrypt", "pushdo", "qsnatch",
+    __limited = ["bazarbackdoor", "chinad", "locky", "padcrypt", "pushdo", "qsnatch", "ranbyus",
                     "sisron", "tempedreve", "tinba", "unnamed_downloader"]
     __multiple = ["bazarbackdoor", "kraken", "locky", "murofet", "necurs", "pykspa", "qsnatch",
                     "vawtrak"]
@@ -77,6 +77,9 @@ class GenerateDGA:
         """
         Get random char based domains and divide them into files.
         The algorithms between files are mutually exclusive to each other.
+        Please be aware that some scripts in this algorithm are hardcoded
+        and may not generate enough samples from an arbitrary number.
+        Number of samples in the final .txt file can be less than expected.
         """
         self.__gen_attack_char_based()
         algo_per_file = math.floor(len(self.__domain_list) / number_of_files)
@@ -218,11 +221,11 @@ class GenerateDGA:
             "qakbot": lambda: self.__case_4(file),
             "ramdo": lambda: self.__case_4(file),
             "ramnit": lambda: self.__case_3(file),
+            "ranbyus": lambda: self.__case_1(file),
             "reconyc": lambda: self.__case_4(file),
             "shiotob": lambda: self.__case_0(file),
             "simda": lambda: self.__case_4(file),
             "symmi": lambda: self.__case_4(file),
-            "unknown_malware": lambda: self.__case_1(file),
             "vawtrak": lambda: self.__case_4(file),
             "zloader": lambda: self.__case_4(file),
         }
@@ -245,9 +248,8 @@ class GenerateDGA:
         self.__run_algorithm([seed_domain, "-n", str(self.__gen_num)], file)
 
     def __case_1(self, file):
-        """For unknown_malware"""
-        choice_list = ["sn", "al"]
-        self.__run_algorithm([random.choice(choice_list), "-n", str(self.__gen_num)], file)
+        """For ranbyus"""
+        self.__run_algorithm([], file)
 
     def __case_2(self, file):
         """For fobber"""
