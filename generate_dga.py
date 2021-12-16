@@ -86,10 +86,10 @@ class GenerateDGA:
         remain = len(self.__domain_list) % number_of_files
         algo_per_file_list = []
         for index in range(number_of_files):
-            if index <= remain:
-                algo_per_file_list.append(algo_per_file)
-            else:
+            if index < remain:
                 algo_per_file_list.append(algo_per_file+1)
+            else:
+                algo_per_file_list.append(algo_per_file)
         random.shuffle(algo_per_file_list)
         for index in range(number_of_files):
             temp_list = self.__flatten_list(
