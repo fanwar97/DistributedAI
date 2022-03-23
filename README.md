@@ -22,11 +22,11 @@ sudo apt install git
 
 ***How to run our apps***
 1) Run a client:
-   cd DistributedAI/Client/
-   sudo python3 full_feature_client.py
+   >cd DistributedAI/Client/
+   >sudo python3 full_feature_client.py
 3) Run a server:
-   cd DistributedAI/Server/
-   sudo python3 threaded_server.py
+   >cd DistributedAI/Server/
+   >sudo python3 threaded_server.py
    
 ***Link video recording my demo for Trung Kien Nguyen***
 
