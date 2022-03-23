@@ -24,9 +24,10 @@ sudo apt install git
 1) Run a client:
    cd DistributedAI/Client/
    sudo python3 full_feature_client.py
-3) Run a server
+3) Run a server:
    cd DistributedAI/Server/
    sudo python3 threaded_server.py
    
 ***Link video recording my demo for Trung Kien Nguyen***
+
 https://husteduvn.sharepoint.com/sites/DistributedAI-Temp/Shared%20Documents/General/Recordings/Meeting%20in%20_General_-20220323_212246-Meeting%20Recording.mp4?web=1
