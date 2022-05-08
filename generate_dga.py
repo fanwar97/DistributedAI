@@ -10,15 +10,58 @@ import random
 import subprocess
 
 
+def flatten_list(nested_list):
+    """Flatten out a 2D nested list"""
+    temp = []
+    list(map(temp.extend, nested_list))
+    return temp
+
+
+def check_name_in_list(name, alist):
+    """Check if a name is in a list"""
+    for elem in alist:
+        if name == elem:
+            return True
+    return False
+
+
+def check_name_list_in_file(name_list, file):
+    """Check if a list of names is in a filename"""
+    for elem in name_list:
+        if elem in file:
+            return True, elem
+    return False, None
+
+
 class GenerateDGA:
     """Class to generate domains"""
-    __org_path = os.getcwd() + "/"
-    __files = list(glob.glob("generators" + "/**/dga*.py", recursive=True))
-    __dict_based = ["gozi", "nymaim2", "pizd", "suppobox"]
-    __limited = ["bazarbackdoor", "chinad", "locky", "padcrypt", "pushdo", "qsnatch", "ranbyus",
-                    "sisron", "tempedreve", "tinba", "unnamed_downloader"]
-    __multiple = ["bazarbackdoor", "kraken", "locky", "murofet", "necurs", "pykspa", "qsnatch",
-                    "vawtrak"]
+
+    _org_path = os.getcwd() + "/"
+    _files = list(glob.glob("generators" + "/**/dga*.py", recursive=True))
+    _dict_based = ["gozi", "nymaim2", "pizd", "suppobox"]
+    _limited = [
+        "bazarbackdoor",
+        "chinad",
+        "locky",
+        "padcrypt",
+        "pushdo",
+        "qsnatch",
+        "ranbyus",
+        "sisron",
+        "tempedreve",
+        "tinba",
+        "unnamed_downloader",
+    ]
+    _multiple = [
+        "bazarbackdoor",
+        "kraken",
+        "locky",
+        "murofet",
+        "necurs",
+        "pykspa",
+        "qsnatch",
+        "vawtrak",
+    ]
 
     ###
     # Number of samples:    Final number of generated domains by each algorithm
@@ -27,51 +70,66 @@ class GenerateDGA:
     #           again for the final output
     # NOTE: Gen num > Number of samples
     ###
-    def __init__(self, python_path, number_of_samples, gen_num = None, output_dir = None):
-        self.__domain_list = []
-        self.__multiple_list = []
-        self.__number_of_samples = number_of_samples
-        self.__python_path = python_path
-        self.__gen_num = gen_num
-        self.__output_dir = output_dir
-        if not os.path.isabs(self.__python_path):
-            self.__python_path = os.path.abspath("") + "/" + self.__python_path
-        if not self.__output_dir:
-            self.__output_dir = ""
+    def __init__(self, python_path, number_of_samples, gen_num=None, output_dir=None):
+        self._domain_list = []
+        self._multiple_list = []
+        self._number_of_samples = number_of_samples
+        self._python_path = python_path
+        self._gen_num = gen_num
+        self._output_dir = output_dir
+        if not os.path.isabs(self._python_path):
+            self._python_path = os.path.abspath("") + "/" + self._python_path
+        if not self._output_dir:
+            self._output_dir = ""
         else:
-            if not self.__output_dir.endswith("\\") or not self.__output_dir.endswith("/"):
-                self.__output_dir = self.__output_dir + "/"
-            if not os.path.isdir(self.__output_dir):
-                os.makedirs(self.__output_dir)
-        if self.__gen_num:
-            if self.__gen_num < self.__number_of_samples:
-                print("Number of domains to be generate is smaller than number of samples\n"
-                        "Changing it to", self.__number_of_samples)
-        if not self.__gen_num or self.__gen_num < self.__number_of_samples:
-            self.__gen_num = self.__number_of_samples
+            if not self._output_dir.endswith("\\") or not self._output_dir.endswith(
+                "/"
+            ):
+                self._output_dir = self._output_dir + "/"
+            if not os.path.isdir(self._output_dir):
+                os.makedirs(self._output_dir)
+        if self._gen_num:
+            if self._gen_num < self._number_of_samples:
+                print(
+                    "Number of domains to be generate is smaller than number of samples\n"
+                    "Changing it to",
+                    self._number_of_samples,
+                )
+        if not self._gen_num or self._gen_num < self._number_of_samples:
+            self._gen_num = self._number_of_samples
 
     def get_attack_dict_based(self):
         """Get random dict based domains."""
         print("Generating dict based domains...")
-        for file in self.__files:
-            is_dict_based = self.__check_name_list_in_file(self.__dict_based, file)[0]
+        for file in self._files:
+            is_dict_based = check_name_list_in_file(self._dict_based, file)[0]
             if is_dict_based:
                 print(file)
             else:
                 continue
-            self.__exec_dict_based(pathlib.PurePath(file).as_posix())
-        domain_list_expanded = self.__flatten_list(self.__domain_list)
-        self.__write_attack_to_file(domain_list_expanded, self.__output_dir + "attack_dict_based_" +
-                                    str(self.__number_of_samples) + "_each.txt")
-        self.__domain_list.clear()
+            self._exec_dict_based(pathlib.PurePath(file).as_posix())
+        domain_list_expanded = flatten_list(self._domain_list)
+        self._write_attack_to_file(
+            domain_list_expanded,
+            self._output_dir
+            + "attack_dict_based_"
+            + str(self._number_of_samples)
+            + "_each.txt",
+        )
+        self._domain_list.clear()
 
     def get_attack_char_based(self):
         """Get random char based domains"""
-        self.__gen_attack_char_based()
-        domain_list_expanded = self.__flatten_list(self.__domain_list)
-        self.__write_attack_to_file(domain_list_expanded, self.__output_dir + "attack_char_based_" +
-                                    str(self.__number_of_samples) + "_each.txt")
-        self.__domain_list.clear()
+        self._gen_attack_char_based()
+        domain_list_expanded = flatten_list(self._domain_list)
+        self._write_attack_to_file(
+            domain_list_expanded,
+            self._output_dir
+            + "attack_char_based_"
+            + str(self._number_of_samples)
+            + "_each.txt",
+        )
+        self._domain_list.clear()
 
     def get_attack_char_based_mutually_exclusive(self, number_of_files):
         """
@@ -81,65 +139,83 @@ class GenerateDGA:
         and may not generate enough samples from an arbitrary number.
         Number of samples in the final .txt file can be less than expected.
         """
-        self.__gen_attack_char_based()
-        algo_per_file = math.floor(len(self.__domain_list) / number_of_files)
-        remain = len(self.__domain_list) % number_of_files
+        self._gen_attack_char_based()
+        algo_per_file = math.floor(len(self._domain_list) / number_of_files)
+        remain = len(self._domain_list) % number_of_files
         algo_per_file_list = []
         for index in range(number_of_files):
             if index < remain:
-                algo_per_file_list.append(algo_per_file+1)
+                algo_per_file_list.append(algo_per_file + 1)
             else:
                 algo_per_file_list.append(algo_per_file)
         random.shuffle(algo_per_file_list)
         for index in range(number_of_files):
-            temp_list = self.__flatten_list(
-                            self.__domain_list.pop(random.randrange(len(self.__domain_list)))
-                            for _ in range(algo_per_file_list[index]))
-            self.__write_attack_to_file(temp_list, self.__output_dir +
-                                        "attack_char_based_mutually_exclusive" + "_" +
-                                        str(index+1).zfill(2) + ".txt")
-        self.__domain_list.clear()
+            temp_list = flatten_list(
+                self._domain_list.pop(random.randrange(len(self._domain_list)))
+                for _ in range(algo_per_file_list[index])
+            )
+            self._write_attack_to_file(
+                temp_list,
+                self._output_dir
+                + "attack_char_based_mutually_exclusive"
+                + "_"
+                + str(index + 1).zfill(2)
+                + ".txt",
+            )
+        self._domain_list.clear()
 
     def get_attack_by_algo(self, algo_name, number_of_files):
         """Get attack domains by algorithm name"""
-        samples_per_file = math.ceil(self.__number_of_samples / number_of_files)
+        samples_per_file = math.ceil(self._number_of_samples / number_of_files)
         algo_list = os.listdir("generators")
-        is_exist = self.__check_name_in_list(algo_name, algo_list)
+        is_exist = check_name_in_list(algo_name, algo_list)
         if not is_exist:
             print("Algorithm doesn't exist. Please check again!")
         else:
             print("Generating " + algo_name + " domains...")
-            is_dict_based = self.__check_name_in_list(algo_name, self.__dict_based)
-            is_limited = self.__check_name_in_list(algo_name, self.__limited)
+            is_dict_based = check_name_in_list(algo_name, self._dict_based)
+            is_limited = check_name_in_list(algo_name, self._limited)
             if is_limited:
-                print("Please be aware that some scripts in this algorithm are hardcoded "
-                        "and may not generate enough samples from an arbitrary number.\n"
-                        "Number of generated files can be less than expected.")
-            for file in self.__files:
+                print(
+                    "Please be aware that some scripts in this algorithm are hardcoded "
+                    "and may not generate enough samples from an arbitrary number.\n"
+                    "Number of generated files can be less than expected."
+                )
+            for file in self._files:
                 if algo_name in file:
                     print(file)
                     if not is_dict_based:
-                        self.__exec_char_based(pathlib.PurePath(file).as_posix())
+                        self._exec_char_based(pathlib.PurePath(file).as_posix())
                     else:
-                        self.__exec_dict_based(pathlib.PurePath(file).as_posix())
-            if self.__multiple_list:
-                self.__process_multiple()
-                self.__multiple_list.clear()
-            if len(self.__domain_list[0]) < self.__number_of_samples:
-                number_of_files = math.ceil(len(self.__domain_list[0]) / samples_per_file)
+                        self._exec_dict_based(pathlib.PurePath(file).as_posix())
+            if self._multiple_list:
+                self._process_multiple()
+                self._multiple_list.clear()
+            if len(self._domain_list[0]) < self._number_of_samples:
+                number_of_files = math.ceil(
+                    len(self._domain_list[0]) / samples_per_file
+                )
             for index in range(number_of_files):
-                temp_list = self.__domain_list[0][index*samples_per_file:
-                                                    (index+1)*samples_per_file]
-                self.__write_attack_to_file(temp_list, self.__output_dir + algo_name + "_" +
-                                            str(samples_per_file) + "_" +
-                                            str(index+1).zfill(2) + ".txt")
-            self.__domain_list.clear()
+                temp_list = self._domain_list[0][
+                    index * samples_per_file : (index + 1) * samples_per_file
+                ]
+                self._write_attack_to_file(
+                    temp_list,
+                    self._output_dir
+                    + algo_name
+                    + "_"
+                    + str(samples_per_file)
+                    + "_"
+                    + str(index + 1).zfill(2)
+                    + ".txt",
+                )
+            self._domain_list.clear()
 
-    def __run_algorithm(self, arguments, file):
+    def _run_algorithm(self, arguments, file):
         """Run each algorithm script"""
-        command_list = [self.__python_path, os.path.basename(file)]
+        command_list = [self._python_path, os.path.basename(file)]
         command_list.extend(arguments)
-        os.chdir(self.__org_path + os.path.dirname(file))
+        os.chdir(self._org_path + os.path.dirname(file))
         with subprocess.Popen(command_list, stdout=subprocess.PIPE) as proc:
             out = proc.communicate()[0]
         if os.name == "nt":
@@ -147,177 +223,175 @@ class GenerateDGA:
         else:
             temp_domain_list = out.decode("utf-8").split("\n")
         temp_domain_list.pop()
-        if len(temp_domain_list) > self.__number_of_samples:
-            temp_domain_list = random.sample(temp_domain_list, self.__number_of_samples)
-        elif len(temp_domain_list) < self.__number_of_samples:
-            is_limited = self.__check_name_list_in_file(self.__limited, file)[0]
+        if len(temp_domain_list) > self._number_of_samples:
+            temp_domain_list = random.sample(temp_domain_list, self._number_of_samples)
+        elif len(temp_domain_list) < self._number_of_samples:
+            is_limited = check_name_list_in_file(self._limited, file)[0]
             if not is_limited:
-                print("Not enough samples were generated. Generated:", len(temp_domain_list))
-        is_multiple = self.__check_name_list_in_file(self.__multiple, file)[0]
+                print(
+                    "Not enough samples were generated. Generated:",
+                    len(temp_domain_list),
+                )
+        is_multiple = check_name_list_in_file(self._multiple, file)[0]
         if is_multiple:
-            self.__multiple_list.extend(temp_domain_list)
+            self._multiple_list.extend(temp_domain_list)
         else:
-            self.__domain_list.append(temp_domain_list)
+            self._domain_list.append(temp_domain_list)
 
-    def __exec_dict_based(self, file):
+    def _exec_dict_based(self, file):
         """
         Execute the corresponding dict based script.\n
         This function evaluates algorithm name and execute with corresponding params.
         """
         if "suppobox" in file:
-            self.__run_algorithm([str(random.randint(1,3)), "-n", str(self.__gen_num)], file)
+            self._run_algorithm(
+                [str(random.randint(1, 3)), "-n", str(self._gen_num)], file
+            )
         else:
-            self.__run_algorithm(["-n", str(self.__gen_num)], file)
+            self._run_algorithm(["-n", str(self._gen_num)], file)
 
-    def __write_attack_to_file(self, domain_list, output_name):
+    def _write_attack_to_file(self, domain_list, output_name):
         """Write the generated samples to a text file"""
-        os.chdir(self.__org_path)
+        os.chdir(self._org_path)
         with open(output_name, "w", encoding="utf-8") as file:
             for element in domain_list:
                 file.write(element + "\n")
 
-    def __gen_attack_char_based(self):
+    def _gen_attack_char_based(self):
         """Generate random char based domains"""
         print("Generating char based domains...")
         current_multiple = None
-        for file in self.__files:
-            which_mul = self.__check_name_list_in_file(self.__multiple, file)[1]
+        for file in self._files:
+            which_mul = check_name_list_in_file(self._multiple, file)[1]
             if current_multiple != which_mul:
-                if self.__multiple_list:
-                    self.__process_multiple()
-                    self.__multiple_list.clear()
+                if self._multiple_list:
+                    self._process_multiple()
+                    self._multiple_list.clear()
                 current_multiple = which_mul
-            is_dict_based = self.__check_name_list_in_file(self.__dict_based, file)[0]
+            is_dict_based = check_name_list_in_file(self._dict_based, file)[0]
             if not is_dict_based:
                 print(file)
             else:
                 continue
-            self.__exec_char_based(pathlib.PurePath(file).as_posix())
+            self._exec_char_based(pathlib.PurePath(file).as_posix())
 
-    def __exec_char_based(self, file):
+    def _exec_char_based(self, file):
         """
         Execute the corresponding char based script.\n
         This function evaluates algorithm name and execute with corresponding params.
         """
-        char_based_case = {
-            "banjori": lambda: self.__default_case(file),
-            "corebot": lambda: self.__default_case(file),
-            "dircrypt": lambda: self.__case_4(file),
-            "dnschanger": lambda: self.__case_4(file),
-            "fobber": lambda: self.__case_3(file),
-            "fosniw": lambda: self.__default_case(file),
-            "kraken": lambda: self.__default_case(file),
-            "locky/dgav3.py": lambda: self.__default_case(file),
-            "murofet": lambda: self.__default_case(file),
-            "mydoom": lambda: self.__default_case(file),
-            "necurs": lambda: self.__default_case(file),
-            "newgoz": lambda: self.__default_case(file),
-            "nymaim": lambda: self.__default_case(file),
-            "pitou": lambda: self.__default_case(file),
-            "pizd": lambda: self.__default_case(file),
-            "proslikefan": lambda: self.__default_case(file),
-            "pykspa": lambda: self.__default_case(file),
-            "qadars": lambda: self.__default_case(file),
-            "qakbot": lambda: self.__default_case(file),
-            "ramdo": lambda: self.__default_case(file),
-            "ramnit": lambda: self.__case_4(file),
-            "ranbyus": lambda: self.__case_2(file),
-            "reconyc": lambda: self.__default_case(file),
-            "shiotob": lambda: self.__case_1(file),
-            "simda": lambda: self.__default_case(file),
-            "symmi": lambda: self.__default_case(file),
-            "vawtrak": lambda: self.__default_case(file),
-            "zloader": lambda: self.__default_case(file),
-        }
-        is_char_based_with_params = False
-        for item in char_based_case.items():
-            if item[0] in file:
-                is_char_based_with_params = True
-                item[1]()
-                break
-        if not is_char_based_with_params:
-            self.__run_algorithm([], file)
-
-    def __case_1(self, file):
-        """For shiotob"""
-        os.chdir(self.__org_path)
-        with open("benign.txt", "r", encoding="utf-8") as temp_file:
-            while random.randrange(self.__gen_num):
-                temp_file.readline()
-            seed_domain = temp_file.readline().rstrip("\n")
-        self.__run_algorithm([seed_domain, "-n", str(self.__gen_num)], file)
-
-    def __case_2(self, file):
-        """For ranbyus"""
-        self.__run_algorithm([], file)
-
-    def __case_3(self, file):
-        """For fobber"""
-        self.__run_algorithm([str(random.randint(1,2)), "-n", str(self.__gen_num)], file)
-
-    def __case_4(self, file):
-        """For dircrypt, dnstracker and ramnit"""
-        self.__run_algorithm([str(random.randint(0, self.__gen_num)), "-n",
-                                str(self.__gen_num)], file)
-
-    def __default_case(self, file):
-        """Most of the cases"""
-        self.__run_algorithm(["-n", str(self.__gen_num)], file)
-
-    def __process_multiple(self):
-        """Process algorithm that have multiple scripts"""
-        if len(self.__multiple_list) <= self.__number_of_samples:
-            self.__domain_list.append(self.__multiple_list)
+        is_param, func = self._eval_char_based_param(file)
+        if is_param:
+            func()
         else:
-            self.__domain_list.append(random.sample(self.__multiple_list, self.__number_of_samples))
+            self._run_algorithm([], file)
 
-    @staticmethod
-    def __flatten_list(nested_list):
-        """Flatten out a 2D nested list"""
-        temp = []
-        list(map(temp.extend, nested_list))
-        return temp
-
-    @staticmethod
-    def __check_name_in_list(name, alist):
-        """Check if a name is in a list"""
-        for elem in alist:
-            if name == elem:
-                return True
-        return False
-
-    @staticmethod
-    def __check_name_list_in_file(name_list, file):
-        """Check if a list of names is in a filename"""
-        for elem in name_list:
-            if elem in file:
-                return True, elem
+    def _eval_char_based_param(self, file):
+        char_based_param = {
+            lambda: self._default_case(file): {
+                "banjori",
+                "corebot",
+                "fosniw",
+                "kraken",
+                "locky/dgav3.py",
+                "murofet",
+                "mydoom",
+                "necurs",
+                "newgoz",
+                "nymaim",
+                "pitou",
+                "pizd",
+                "proslikefan",
+                "pykspa",
+                "qadars",
+                "qakbot",
+                "ramdo",
+                "reconyc",
+                "simda",
+                "symmi",
+                "vawtrak",
+                "zloader",
+            },
+            lambda: self._case_1(file): {"shiotob"},
+            lambda: self._case_2(file): {"ranbyus"},
+            lambda: self._case_3(file): {"fobber"},
+            lambda: self._case_4(file): {"dircrypt", "dnschanger", "ramnit"},
+        }
+        for case, algos in char_based_param.items():
+            for algo in algos:
+                if algo in file:
+                    return True, case
         return False, None
 
-if __name__=="__main__":
+    def _case_1(self, file):
+        """For shiotob"""
+        os.chdir(self._org_path)
+        with open("benign.txt", "r", encoding="utf-8") as temp_file:
+            while random.randrange(self._gen_num):
+                temp_file.readline()
+            seed_domain = temp_file.readline().rstrip("\n")
+        self._run_algorithm([seed_domain, "-n", str(self._gen_num)], file)
+
+    def _case_2(self, file):
+        """For ranbyus"""
+        self._run_algorithm([], file)
+
+    def _case_3(self, file):
+        """For fobber"""
+        self._run_algorithm([str(random.randint(1, 2)), "-n", str(self._gen_num)], file)
+
+    def _case_4(self, file):
+        """For dircrypt, dnstracker and ramnit"""
+        self._run_algorithm(
+            [str(random.randint(0, self._gen_num)), "-n", str(self._gen_num)], file
+        )
+
+    def _default_case(self, file):
+        """Common cases"""
+        self._run_algorithm(["-n", str(self._gen_num)], file)
+
+    def _process_multiple(self):
+        """Process algorithm that have multiple scripts"""
+        if len(self._multiple_list) <= self._number_of_samples:
+            self._domain_list.append(self._multiple_list)
+        else:
+            self._domain_list.append(
+                random.sample(self._multiple_list, self._number_of_samples)
+            )
+
+
+def main():
+    """Main function"""
     parser = argparse.ArgumentParser(description="Generate DGAs randomly")
     parser.add_argument("samples", type=int, help="samples per algorithm")
-    parser.add_argument("--py_path",
-                        help="python path to run algorithm scripts, default to /usr/bin/python3",
-                        default= "/usr/bin/python3")
-    parser.add_argument("--init_num",
-                        help="initial number of generated domains "
-                                "before being randomly sampled again",
-                        type=int)
-    parser.add_argument("--out_dir",
-                        help="output directory of the generated domains, "
-                                "default to Client/train_file/",
-                        default="Client/train_file/")
+    parser.add_argument(
+        "--py_path",
+        help="python path to run algorithm scripts, default to /usr/bin/python3",
+        default="/usr/bin/python3",
+    )
+    parser.add_argument(
+        "--init_num",
+        help="initial number of generated domains "
+        "before being randomly sampled again",
+        type=int,
+    )
+    parser.add_argument(
+        "--out_dir",
+        help="output directory of the generated domains, "
+        "default to Client/train_file/",
+        default="Client/train_file/",
+    )
     extended = parser.add_argument_group("extended functions")
-    extended.add_argument("--algo",
-                            help="algorithm to generate attack domains")
-    extended.add_argument("--file_num",
-                            help="number of files to be divided into. "
-                                    "This argument usually goes with --algo. "
-                                    "If it is specified alone, the script will generate char-based "
-                                    "attack domains and divide them into files, the algorithms in "
-                                    "all of which will be mutually exclusive to each other",
-                            type=int)
+    extended.add_argument("--algo", help="algorithm to generate attack domains")
+    extended.add_argument(
+        "--file_num",
+        help="number of files to be divided into. "
+        "This argument usually goes with --algo. "
+        "If it is specified alone, the script will generate char-based "
+        "attack domains and divide them into files, the algorithms in "
+        "all of which will be mutually exclusive to each other",
+        type=int,
+    )
     args = parser.parse_args()
 
     gen = GenerateDGA(args.py_path, args.samples, args.init_num, args.out_dir)
@@ -328,8 +402,9 @@ if __name__=="__main__":
     elif args.algo:
         parser.error("Both --algo and --file_num flags must be specified together.")
     else:
-        for i in range(2):
-            if i == 0:
-                gen.get_attack_dict_based()
-            if i == 1:
-                gen.get_attack_char_based()
+        gen.get_attack_dict_based()
+        gen.get_attack_char_based()
+
+
+if __name__ == "__main__":
+    main()
