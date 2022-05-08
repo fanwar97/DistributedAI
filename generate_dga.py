@@ -280,13 +280,9 @@ class GenerateDGA:
         Execute the corresponding char based script.\n
         This function evaluates algorithm name and execute with corresponding params.
         """
-        is_param, func = self._eval_char_based_param(file)
-        if is_param:
-            func()
-        else:
-            self._run_algorithm([], file)
+        self._eval_char_based_cases(file)()
 
-    def _eval_char_based_param(self, file):
+    def _eval_char_based_cases(self, file):
         char_based_param = {
             lambda: self._default_case(file): {
                 "banjori",
@@ -320,8 +316,8 @@ class GenerateDGA:
         for case, algos in char_based_param.items():
             for algo in algos:
                 if algo in file:
-                    return True, case
-        return False, None
+                    return case
+        return lambda: self._run_algorithm([], file)
 
     def _case_1(self, file):
         """For shiotob"""
