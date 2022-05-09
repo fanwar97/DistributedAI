@@ -309,9 +309,8 @@ class GenerateDGA:
                 "zloader",
             },
             lambda: self._case_1(file): {"shiotob"},
-            lambda: self._case_2(file): {"ranbyus"},
-            lambda: self._case_3(file): {"fobber"},
-            lambda: self._case_4(file): {"dircrypt", "dnschanger", "ramnit"},
+            lambda: self._case_2(file): {"fobber"},
+            lambda: self._case_3(file): {"dircrypt", "dnschanger", "ramnit"},
         }
         for case, algos in char_based_param.items():
             for algo in algos:
@@ -329,14 +328,10 @@ class GenerateDGA:
         self._run_algorithm([seed_domain, "-n", str(self._gen_num)], file)
 
     def _case_2(self, file):
-        """For ranbyus"""
-        self._run_algorithm([], file)
-
-    def _case_3(self, file):
         """For fobber"""
         self._run_algorithm([str(random.randint(1, 2)), "-n", str(self._gen_num)], file)
 
-    def _case_4(self, file):
+    def _case_3(self, file):
         """For dircrypt, dnstracker and ramnit"""
         self._run_algorithm(
             [str(random.randint(0, self._gen_num)), "-n", str(self._gen_num)], file
